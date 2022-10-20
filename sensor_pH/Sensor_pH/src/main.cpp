@@ -17,7 +17,7 @@ int buf[10],temp;
 void setup()
 {
   pinMode(13,OUTPUT);  
-  Serial.begin(9600);  
+  Serial.begin(115200);  
   Serial.println("Ready");    //Test the serial monitor
 }
 void loop()
