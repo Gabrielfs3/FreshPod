@@ -9,7 +9,7 @@
  # SKU    : SEN0161
 */
 
-#define SensorPin 0          //pH meter Analog output to Arduino Analog Input 0
+#define SensorPin 2          //pH meter Analog output to Arduino Analog Input 0
 unsigned long int avgValue;  //Store the average value of the sensor feedback
 float b;
 int buf[10],temp;
@@ -42,8 +42,13 @@ void loop()
   avgValue=0;
   for(int i=2;i<8;i++)                      //take the average value of 6 center sample
     avgValue+=buf[i];
-  float phValue=(float)avgValue*5.0/1024/6; //convert the analog into millivolt
-  phValue=3.5*phValue;                      //convert the millivolt into pH value
+  Serial.print("    niveis:");
+  avgValue = ((float)avgValue/6);
+  Serial.print(avgValue,2);
+  float phValue=(float)avgValue*3.3/8192; //convert the analog into millivolt
+  Serial.print("    vol:");  
+  Serial.print(phValue,2);
+  phValue=4.24242424*phValue;                      //convert the millivolt into pH value
   Serial.print("    pH:");  
   Serial.print(phValue,2);
   Serial.println(" ");

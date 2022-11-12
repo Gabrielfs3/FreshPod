@@ -17,12 +17,12 @@ float b;
 int buf[10],temp;
 
 // Replace the next variables with your SSID/Password combination
-const char* ssid = "REPLACE_WITH_YOUR_SSID";
-const char* password = "REPLACE_WITH_YOUR_PASSWORD";
+const char* ssid = "A51";
+const char* password = "qwerty123";
 
 // Add your MQTT Broker IP address, example:
 //const char* mqtt_server = "192.168.1.144";
-const char* mqtt_server = "YOUR_MQTT_BROKER_IP_ADDRESS";
+const char* mqtt_server = "192.168.1.144";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -30,12 +30,13 @@ long lastMsg = 0;
 char msg[50];
 int value = 0;
 const int ledPin = 4;
+void callback(char* topic, byte* message, unsigned int length);
+
 void setup()
 {
   pinMode(13,OUTPUT);  
   Serial.begin(115200);  
   Serial.println("Ready");    //Test the serial monitor
-
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
@@ -66,25 +67,35 @@ void callback(char* topic, byte* message, unsigned int length) {
   Serial.println();
 
   // Feel free to add more if statements to control more GPIOs with MQTT
+}
 
-  // If a message is received on the topic esp32/output, you check if the message is either "on" or "off". 
-  // Changes the output state according to the message
-  if (String(topic) == "esp32/output") {
-    Serial.print("Changing output to ");
-    if(messageTemp == "on"){
-      Serial.println("on");
-      digitalWrite(ledPin, HIGH);
-    }
-    else if(messageTemp == "off"){
-      Serial.println("off");
-      digitalWrite(ledPin, LOW);
+void reconnect() {
+  // Loop until we're reconnected
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (client.connect("ESP32s2")) {
+      Serial.println("connected");
+      // Subscribe
+      client.subscribe("esp32/output");
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
     }
   }
 }
 
-
 void loop()
 {
+  if (!client.connected()) {
+    reconnect();
+  }
+
+  client.loop();
+
   for(int i=0;i<10;i++)       //Get 10 sample value from the sensor for smooth the value
   { 
     buf[i]=analogRead(SensorPin);
@@ -113,6 +124,9 @@ void loop()
   digitalWrite(13, HIGH);       
   delay(800);
   digitalWrite(13, LOW); 
+  char str[32];
+  dtostrf(phValue, 8, 2, str);
+  client.publish("esp32/ph",(char*)str);
 
 }
 
