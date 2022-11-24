@@ -10,27 +10,28 @@ sensorEC::sensorEC(int pin)
 
 void sensorEC::init()
 {
-    pinMode(pin_ec,OUTPUT);
+    pinMode(pin_ec,INPUT);
 }
 
-void sensorEC::volt_EC()
+
+float sensorEC::get_EC()
 {
-   /* for(int i=0;i<10;i++)                               //Get 10 sample value from the sensor for smooth the value
+   for(int i=0;i<10;i++)                               //Get 10 sample value from the sensor for smooth the value
     { 
-        buf[i]=analogRead(SensorPin);                   //Saves 10 samples on a buffer got from the sensor reading
-        delay(1000);
+        buf[i]=analogRead(pin_ec);                   //Saves 10 samples on a buffer got from the sensor reading
+        delay(100);
     }
     for(int i=0;i<9;i++)                                //Sort the analog from small to large
     {
-    for(int j=i+1;j<10;j++)                             //Sweep all values saved on buffer
-    {
-        if(buf[i]>buf[j])
+        for(int j=i+1;j<10;j++)                             //Sweep all values saved on buffer
         {
-            temp=buf[i];
-            buf[i]=buf[j];
-            buf[j]=temp;
+            if(buf[i]>buf[j])
+            {
+                temp=buf[i];
+                buf[i]=buf[j];
+                buf[j]=temp;
+            }
         }
-    }
     }
 
     avgValue=0;
@@ -39,19 +40,8 @@ void sensorEC::volt_EC()
     {                                               //Get rid of first 2 and last 2 samples
         avgValue+=buf[i];
     }
-  
-    //Serial.print("    niveis:");
-
     avgValue = ((float)avgValue/6);                 //Calculate mean value of 6 samples
-    //Serial.print(avgValue,2);                       //Print value with 2 decimal digits*/
-    ec_Value=(float)avgValue*3.3/4096*4.24242424;        //Convert the analog value into millivolt
-    //Serial.print("    vol:");  
-
-    //Serial.print(ec_Value,2);                       //Print value with 2 decimal digits
-    //ec_Value=4.24242424*ec_Value;                   //Convert the millivolt into EC value
-}
-
-float sensorEC::get_EC()
-{
+    ec_Value=(float)avgValue*3.3/4096;              //Convert the analog value into millivolt
+    ec_Value=6.060606060*ec_Value;                  //Convert the millivolt into EC value
     return ec_Value;
 }

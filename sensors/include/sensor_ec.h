@@ -6,7 +6,6 @@ class sensorEC
     public:
         sensorEC(int pin);
         void init();
-        void volt_EC();
         float get_EC();
     
     private:

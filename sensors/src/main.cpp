@@ -3,9 +3,9 @@
 #include "sensor_ec.h"
 #include "sensor_o2.h"
 
-sensorpH sensorph(14);
-sensorO2 sensoro2(15);
-sensorEC sensorec(16);
+sensorpH sensorph(25);
+sensorO2 sensoro2(26);
+sensorEC sensorec(27);
 
 void setup()
 {
@@ -18,16 +18,20 @@ void setup()
 
 void loop()
 {
-  sensorph.volt_pH();
-  Serial.println("pH: ");
-  Serial.println(sensorph.get_pH());              //Print pH value
-  delay(100);
-  /*sensoro2.volt_O2();
-  Serial.println("O2: ");
-  Serial.println(sensoro2.get_O2());              //Print O2 value
-  delay(100);
-  sensorec.volt_EC();
-  Serial.println("EC: ");
-  Serial.println(sensorec.get_EC());              //Print EC value
-  delay(100);*/
+  Serial.print("pH: ");
+  Serial.print(sensorph.get_pH());              //Print pH value
+  Serial.print(" (adimensional)  ");
+  delay(1000);
+  Serial.print("O2: ");
+  Serial.print(sensoro2.get_O2());              //Print O2 value
+  Serial.print(" (mg/L)  ");
+  delay(1000);
+  Serial.print("EC: ");
+  if (sensorec.get_EC() <1 || sensorec.get_EC() > 15)
+  {
+      Serial.print("Valor fora da gama recomendada! ");
+  }
+  Serial.print(sensorec.get_EC());              //Print EC value
+  Serial.println(" (ms/cm)");
+  delay(1000);
 }

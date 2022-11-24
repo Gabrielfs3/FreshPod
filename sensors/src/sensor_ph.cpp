@@ -10,28 +10,27 @@ sensorpH::sensorpH(int pin)
 void sensorpH::init()
 {
     pinMode(pin_ph,INPUT);
-    Serial.print("aqui");
-
 }
 
-void sensorpH::volt_pH()
-{/*
+float sensorpH::get_pH()
+{
     for(int i=0;i<10;i++)                           //Get 10 sample value from the sensor for smooth the value
     { 
         buf[i]=analogRead(pin_ph);               //Saves 10 samples on a buffer got from the sensor reading
         delay(100);
     }
+
     for(int i=0;i<9;i++)                            //Sort the analog from small to large
     {
-    for(int j=i+1;j<10;j++)                         //Sweep all values saved on buffer
-    {
-        if(buf[i]>buf[j])
+        for(int j=i+1;j<10;j++)                         //Sweep all values saved on buffer
         {
-            temp=buf[i];
-            buf[i]=buf[j];
-            buf[j]=temp;
+            if(buf[i]>buf[j])
+            {
+                ph=buf[i];
+                buf[i]=buf[j];
+                buf[j]=ph;
+            }
         }
-    }
     }
 
     avgValue=0;
@@ -40,21 +39,9 @@ void sensorpH::volt_pH()
     {                                               //Get rid of first 2 and last 2 samples
         avgValue+=buf[i];
     }
-  
-    //Serial.print("    niveis:");
 
-    avgValue = ((float)avgValue/6);                 //Calculate mean value of 6 samples
-    //Serial.print(avgValue,2);                    //Print value with 2 decimal digits*/
-    //avgValue=0;
-    Serial.print(analogRead(pin_ph)); 
+    avgValue = ((int)avgValue/6);                 //Calculate mean value of 6 samples*/
     ph_Value=analogRead(pin_ph)*3.3/4096;         //Convert the analog value into millivolt
-    //Serial.print("    vol:");  
-
-    //Serial.print(ph_Value,2);                        //Print value with 2 decimal digits
-    ph_Value=4.24242424*ph_Value;                     //Convert the millivolt into pH value
-}
-
-float sensorpH::get_pH()
-{
+    ph_Value=4.24242424*ph_Value;                 //Convert the millivolt into pH value
     return ph_Value;
 }

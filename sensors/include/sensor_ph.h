@@ -6,7 +6,6 @@ class sensorpH
     public:
         sensorpH(int pin);
         void init();
-        void volt_pH();
         float get_pH();
     
     private:
@@ -14,7 +13,7 @@ class sensorpH
         int pin_ph;
         unsigned long int avgValue;                         //Store the average value of the sensor feedback
         float b;
-        int buf[10],temp;
+        int buf[10],ph;
 };
 
 #endif

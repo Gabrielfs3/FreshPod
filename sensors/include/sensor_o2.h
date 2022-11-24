@@ -7,7 +7,6 @@ class sensorO2
     public:
         sensorO2(int pin);
         void init();
-        void volt_O2();
         float get_O2();
     
     private:
