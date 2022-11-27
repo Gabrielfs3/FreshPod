@@ -1,18 +1,17 @@
 #include <Arduino.h>
-#include <C:\Users\miigu\OneDrive - Universidade de Aveiro\Makeit_PI\Code\environment_sensors\include\environment_senso.h>
-
+#include "environment_senso.h"
 
 //variables
 //------[DHT11]------
-int yellow_pin=16;
-int DHTTYPE=11; //modelo do equipamento 
+#define yellow_pin  27
+#define DHTTYPE 11 //modelo do equipamento 
 
 //------[HC_SR04]------
-int echoPin=3;
-int trigPin=5;
+#define echoPin 12
+#define trigPin 14
 
 //------[geral]------
-int baudrate=115200;
+#define baudrate    115200
 //---------------------
 float water;
 float temp;
