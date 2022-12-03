@@ -2,60 +2,70 @@
 #include <LinkedList.h>
 #include <StateMachine.h>
 #include <Wifi_esp32.h>
-#include <MQTT.h>
 
 const char* rede = "A51";
 const char* password = "qwerty123";
 
-
 Wifi_esp32 wifi_esp32(rede,password);
-MQTTClient client;
-
 
 const int STATE_DELAY = 1000;
-int randomState = 0;
-const int LED1 = 12;
-const int LED2 = 13;
-const int LED3 = 14;
+
+
+unsigned long previous_time_water=millis();
+unsigned long previous_time_temp_hum=millis();
+unsigned long previous_time_lum=millis();
+
+bool timeout_water_sensor=0;
+bool timeout_temp_hum=0;
+bool timeout_lum_waterlevel=0;
+
+#define sampling_water 30000
+#define sampling_temp_hum 15000
+#define sampling_lum 900000
 
 StateMachine machine = StateMachine();
-void stateCheck_conn();
-void stateWater_sensors();
-void stateEnviroment_sensors();
-void stateSend_mqtt();
+Transition transiton;
 
-bool transitionMqttWifi_off();
-bool transitionRead_water_sensors();
-bool transitionRead_enviroment_sensors();
-bool transitionRequest_msg();
-bool transitionFail_msg();
-bool transitionSend_msg();
+void stateCHECK_CONNECTION();
+void stateMQTT_STATE_STANDBY();
+void stateMQTT_SEND();
+void stateWATER_SENSORS_READ();
+void stateENVIROMENT_SENSOR_READ();
 
 
+bool transitionconn_alive();
+bool transitionno_timeout();
+bool transitionwater_sensor_event_readed();
+bool transitionenviroment_sensor_event_readed();
+//bool transitiontimeout_water_sensor();
+//bool transitiontimeout_temp_hum();
+//bool transitiontimeout_lum_waterlevel();
+bool transitionmsg_sent();
 
-State* S0 = machine.addState(&stateCheck_conn); 
-State* S1 = machine.addState(&stateWater_sensors);
-State* S2 = machine.addState(&stateEnviroment_sensors);
-State* S3 = machine.addState(&stateSend_mqtt);
+
+
+
+State* CHECK_CONNECTION = machine.addState(&stateCHECK_CONNECTION); 
+State* MQTT_STATE_STANDBY = machine.addState(&stateMQTT_STATE_STANDBY);
+State* MQTT_SEND = machine.addState(&stateMQTT_SEND);
+State* WATER_SENSORS_READ = machine.addState(&stateWATER_SENSORS_READ);
+State* ENVIROMENT_SENSOR_READ =machine.addState(&stateENVIROMENT_SENSOR_READ);
+
 
 
 
 void setup() {
   wifi_esp32.connect();
-  // put your setup code here, to run once:
   Serial.begin(115200);
-  pinMode(LED1,OUTPUT);
-  pinMode(LED2,OUTPUT);
-  pinMode(LED3,OUTPUT);
 
-
-  S0->addTransition(&transitionMqttWifi_off,S0);    // Transition to itself (see transition logic for details)
-  S0->addTransition(&transitionRead_water_sensors,S1);  // 
-  S1->addTransition(&transitionRead_enviroment_sensors,S2);  //
-  
-  S2->addTransition(&transitionRequest_msg,S3);  // S
-  S3->addTransition(&transitionFail_msg,S0);  // 
-  S3->addTransition(&transitionSend_msg,S1);
+  CHECK_CONNECTION->addTransition(&transitionconn_alive,MQTT_STATE_STANDBY);    // Transition to itself (see transition logic for details)
+  MQTT_STATE_STANDBY->addTransition(&transitionno_timeout,WATER_SENSORS_READ);  // 
+  //MQTT_STATE_STANDBY->addTransition(&transitiontimeout_water_sensor,MQTT_SEND);
+  //MQTT_STATE_STANDBY->addTransition(&transitiontimeout_temp_hum,MQTT_SEND);
+  //MQTT_STATE_STANDBY->addTransition(&transitiontimeout_lum_waterlevel,MQTT_SEND);
+  MQTT_SEND->addTransition(&transitionmsg_sent,WATER_SENSORS_READ);
+  WATER_SENSORS_READ->addTransition(&transitionwater_sensor_event_readed,ENVIROMENT_SENSOR_READ);  // S
+  ENVIROMENT_SENSOR_READ->addTransition(&transitionenviroment_sensor_event_readed, CHECK_CONNECTION);  // 
   
 }
 
@@ -64,71 +74,107 @@ void loop() {
   machine.run();
   delay(STATE_DELAY);
 }
-
-void stateCheck_conn(){
-  Serial.println("State Check_conn");
+/////////////////// estados/////////////////////////////////
+void stateCHECK_CONNECTION(){
+  //Serial.println("State Check_conn");
   wifi_esp32.connect_live();
- 
-      S0->setTransition(0,1);
    
-
-
-
-  delay(10);
-}
-bool transitionRead_water_sensors(){
-  return true;
 }
 
-bool transitionMqttWifi_off(){
-  return true;
-}
+void stateMQTT_STATE_STANDBY(){
+  //Serial.println("State mqtt stanby");
+  MQTT_STATE_STANDBY->setTransition(0,3);
 
-void stateWater_sensors(){
-  Serial.println("State Water_sensor");
-  digitalWrite(LED1,HIGH);
-  delay(10);
-}
+  if(millis()-previous_time_water> sampling_water)
+  {
+      //Serial.println("time out water");  
+      previous_time_water=millis();
+      timeout_water_sensor=1;
+      MQTT_STATE_STANDBY->setTransition(0,2);
+  }
 
-bool transitionRead_enviroment_sensors(){
-  return true;
-}
+   if(millis()-previous_time_lum> sampling_lum)
+  {
+    //Serial.println("time out lum"); 
+    previous_time_lum=millis();
+    timeout_lum_waterlevel=1;
+    MQTT_STATE_STANDBY->setTransition(0,2);
+  }
 
-//-------------------------
-void stateEnviroment_sensors(){
-  Serial.println("State Enviroment_sensors");
-  digitalWrite(LED2,HIGH);
-  delay(1000);
+   if(millis()-previous_time_temp_hum> sampling_temp_hum)
+  {
+    //Serial.println("time out temphum"); 
+    previous_time_temp_hum=millis();
+    timeout_temp_hum=1; 
+    MQTT_STATE_STANDBY->setTransition(0,2); 
+  }
   
 }
 
-bool transitionRequest_msg(){
-  return true;
+void stateMQTT_SEND(){
+  //Serial.println("State mqtt sent");
+  
+  if(timeout_lum_waterlevel==1)
+  {
+    //envia mqtt
+    //Serial.println("envio lum");
+    timeout_lum_waterlevel=0;
+  }
+  if(timeout_temp_hum==1)
+  {
+    //envia mqtt
+    //Serial.println("envio temp");
+    timeout_temp_hum=0;
+  }
+  if(timeout_water_sensor==1)
+  {
+    //envia mqtt
+    //Serial.println("envio water");
+    timeout_water_sensor=0;
+  }
+
+
 }
 
-//------------------------
-void stateSend_mqtt(){
-  Serial.println("State Send MQTT");
-  digitalWrite(LED3,HIGH);
-  delay(1000);
+
+
+void stateWATER_SENSORS_READ(){
   
-  S3->setTransition(0,1);
+
+  ///
+  //task
   
 }
 
-
-bool transitionFail_msg(){
-  digitalWrite(LED2,LOW);
-  digitalWrite(LED1,LOW);
-  digitalWrite(LED3,LOW);
-  
-  return true;
+void stateENVIROMENT_SENSOR_READ(){
+  //
+  //task
 }
 
-bool transitionSend_msg(){
-  digitalWrite(LED2,LOW);
-  digitalWrite(LED1,LOW);
-  digitalWrite(LED3,LOW);
+
+
+bool transitionconn_alive()
+{
+return true;
+}
+
+bool transitionno_timeout()
+{
+return true;
+}
+
+bool transitionwater_sensor_event_readed()
+{
+return true;
+}
+
+bool transitionenviroment_sensor_event_readed()
+{
+return true;
+}
+
+bool transitionmsg_sent()
+{
   return true;
 }
 
