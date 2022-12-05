@@ -2,6 +2,12 @@
 #include <LinkedList.h>
 #include <StateMachine.h>
 #include <Wifi_esp32.h>
+#include "environment_senso.h"
+#include "sensor_ph.h"
+#include "sensor_ec.h"
+#include "sensor_o2.h"
+#include "DHT11_driver.h"
+#include "water_sensors.h"
 
 const char* rede = "A51";
 const char* password = "qwerty123";
@@ -51,6 +57,31 @@ State* MQTT_SEND = machine.addState(&stateMQTT_SEND);
 State* WATER_SENSORS_READ = machine.addState(&stateWATER_SENSORS_READ);
 State* ENVIROMENT_SENSOR_READ =machine.addState(&stateENVIROMENT_SENSOR_READ);
 
+//Water_Sensors_Inicialization
+int sensor_pin_ph = 33;
+int sensor_pin_o2= 32;
+int sensor_pin_ec = 35;
+
+//float o2, ph, ec;
+
+water_sensors water(sensor_pin_ph, sensor_pin_o2, sensor_pin_ec);
+
+//Environment_Sensors_Inicialization
+//variables & GPIO
+//------[DHT11]------
+#define yellow_pin  27
+#define DHTTYPE 11 //modelo do equipamento 
+
+//------[HC_SR04]------
+#define echoPin 12
+#define trigPin 14
+
+//------[geral]------
+#define baudrate    115200
+//---------------------
+//float water,temp, humi;
+
+environment ambi(yellow_pin, DHTTYPE, echoPin, trigPin, baudrate);
 
 
 
@@ -138,9 +169,9 @@ void stateMQTT_SEND(){
 
 
 
-void stateWATER_SENSORS_READ(){
+void stateWATER_SENSORS_READ()
+{
   
-
   ///
   //task
   
