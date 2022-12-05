@@ -41,6 +41,4 @@ void loop()
   }
   Serial.print(ec);                             //Print EC value
   Serial.println(" (ms/cm)");
-
-  Serial.println("Loop Restarted!");
 }
