@@ -39,7 +39,8 @@ void loop()
   {
       Serial.print("Valor fora da gama recomendada! ");
   }
-  Serial.print(ec);              //Print EC value
+  Serial.print(ec);                             //Print EC value
   Serial.println(" (ms/cm)");
 
+  Serial.println("Loop Restarted!");
 }
