@@ -3,10 +3,6 @@
 #include <StateMachine.h>
 #include <Wifi_esp32.h>
 #include "environment_senso.h"
-#include "sensor_ph.h"
-#include "sensor_ec.h"
-#include "sensor_o2.h"
-#include "DHT11_driver.h"
 #include "water_sensors.h"
 
 const char* rede = "A51";
@@ -85,9 +81,14 @@ environment ambi(yellow_pin, DHTTYPE, echoPin, trigPin, baudrate);
 
 
 
-void setup() {
+void setup()
+{
   wifi_esp32.connect();
   Serial.begin(115200);
+  Serial.println("Ready!");
+
+  water.init();
+  ambi.Init();
 
   CHECK_CONNECTION->addTransition(&transitionconn_alive,MQTT_STATE_STANDBY);    // Transition to itself (see transition logic for details)
   MQTT_STATE_STANDBY->addTransition(&transitionno_timeout,WATER_SENSORS_READ);  // 
@@ -153,14 +154,46 @@ void stateMQTT_SEND(){
   }
   if(timeout_temp_hum==1)
   {
-    //envia mqtt
-    //Serial.println("envio temp");
+    delay(500); // for testing- prints ocorrem 3x a cada sampling da task 
+    Serial.print("\nWater Level? ");
+    dist = ambi.return_Watter();
+    Serial.print(dist,1);
+    Serial.println(" cm");
+
+    Serial.print("\ntemperature? ");
+    temp = ambi.return_Temp();
+    Serial.print(temp,1);
+    Serial.println(" ºC");
+
+    Serial.print("\nHumidity? ");
+    humi = ambi.return_humi();
+    Serial.print(humi,1);
+    Serial.println(" %\t");
+    
     timeout_temp_hum=0;
   }
+
   if(timeout_water_sensor==1)
   {
-    //envia mqtt
-    //Serial.println("envio water");
+    Serial.print("pH: ");
+    ph = water.return_pH();
+    Serial.print(water.return_pH());              //Print pH value
+    Serial.print(" (adimensional)  ");
+
+    Serial.print("O2: ");
+    o2 = water.return_O2();
+    Serial.print(water.return_O2());              //Print O2 value
+    Serial.print(" (mg/L)  ");
+
+    Serial.print("EC: ");
+    ec = water.return_EC();
+    if (ec < 1 || ec > 15)
+    {
+        Serial.print("Valor fora da gama recomendada! ");
+    }
+    Serial.print(ec);              //Print EC value
+    Serial.println(" (ms/cm)");
+
     timeout_water_sensor=0;
   }
 
@@ -172,25 +205,6 @@ void stateMQTT_SEND(){
 void stateWATER_SENSORS_READ()
 {
   water.water_sensors_tasks();
-
-  //Serial.print("pH: ");
-  ph = water.return_pH();
-  //Serial.print(water.return_pH());              //Print pH value
-  //Serial.print(" (adimensional)  ");
-
-  //Serial.print("O2: ");
-  o2 = water.return_O2();
-  //Serial.print(water.return_O2());              //Print O2 value
-  //Serial.print(" (mg/L)  ");
-
-  //Serial.print("EC: ");
-  ec = water.return_EC();
-  /*if (ec < 1 || ec > 15)
-  {
-      Serial.print("Valor fora da gama recomendada! ");
-  }
-  Serial.print(ec);              //Print EC value
-  Serial.println(" (ms/cm)");*/
   ///
   //task
   
@@ -198,23 +212,7 @@ void stateWATER_SENSORS_READ()
 
 void stateENVIROMENT_SENSOR_READ()
 {
-    ambi.environment_sensor_tasks();
-    
-    /*delay(500); // for testing- prints ocorrem 3x a cada sampling da task 
-    Serial.print("\nWater Level? ");*/
-    dist = ambi.return_Watter();
-    /*Serial.print(water,1);
-    Serial.println(" cm");
-
-    Serial.print("\ntemperature? ");*/
-    temp = ambi.return_Temp();
-    /*Serial.print(temp,1);
-    Serial.println(" ºC");
-
-    Serial.print("\nHumidity? ");*/
-    humi = ambi.return_humi();
-    /*Serial.print(humi,1);
-    Serial.println(" %\t");*/
+  ambi.environment_sensor_tasks();
   //
   //task
 }
