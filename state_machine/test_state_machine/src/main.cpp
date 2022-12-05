@@ -62,7 +62,7 @@ int sensor_pin_ph = 33;
 int sensor_pin_o2= 32;
 int sensor_pin_ec = 35;
 
-//float o2, ph, ec;
+float o2, ph, ec;
 
 water_sensors water(sensor_pin_ph, sensor_pin_o2, sensor_pin_ec);
 
@@ -79,7 +79,7 @@ water_sensors water(sensor_pin_ph, sensor_pin_o2, sensor_pin_ec);
 //------[geral]------
 #define baudrate    115200
 //---------------------
-//float water,temp, humi;
+float dist, temp, humi;
 
 environment ambi(yellow_pin, DHTTYPE, echoPin, trigPin, baudrate);
 
@@ -171,13 +171,50 @@ void stateMQTT_SEND(){
 
 void stateWATER_SENSORS_READ()
 {
-  
+  water.water_sensors_tasks();
+
+  //Serial.print("pH: ");
+  ph = water.return_pH();
+  //Serial.print(water.return_pH());              //Print pH value
+  //Serial.print(" (adimensional)  ");
+
+  //Serial.print("O2: ");
+  o2 = water.return_O2();
+  //Serial.print(water.return_O2());              //Print O2 value
+  //Serial.print(" (mg/L)  ");
+
+  //Serial.print("EC: ");
+  ec = water.return_EC();
+  /*if (ec < 1 || ec > 15)
+  {
+      Serial.print("Valor fora da gama recomendada! ");
+  }
+  Serial.print(ec);              //Print EC value
+  Serial.println(" (ms/cm)");*/
   ///
   //task
   
 }
 
-void stateENVIROMENT_SENSOR_READ(){
+void stateENVIROMENT_SENSOR_READ()
+{
+    ambi.environment_sensor_tasks();
+    
+    /*delay(500); // for testing- prints ocorrem 3x a cada sampling da task 
+    Serial.print("\nWater Level? ");*/
+    dist = ambi.return_Watter();
+    /*Serial.print(water,1);
+    Serial.println(" cm");
+
+    Serial.print("\ntemperature? ");*/
+    temp = ambi.return_Temp();
+    /*Serial.print(temp,1);
+    Serial.println(" ºC");
+
+    Serial.print("\nHumidity? ");*/
+    humi = ambi.return_humi();
+    /*Serial.print(humi,1);
+    Serial.println(" %\t");*/
   //
   //task
 }
