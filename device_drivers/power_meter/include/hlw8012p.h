@@ -3,17 +3,19 @@
 
 class hlw8012p{
     public:
-       hlw8012p(int, int, int, char ,bool,long);
-        void Init();
-        float get_current();
-        float get_voltage();
-        float get_power();
+       hlw8012p();
+        void Init(int, int, int, char ,bool,long);
+        void task();
+        double get_current();
+        double get_voltage();
+        double get_power();
+        double * get_energy();
     private:
-        unsigned int cf_pin;
-        unsigned int cf1_pin;
-        unsigned int sel_pin;
-        unsigned char _current_mode;
-        bool use_interrupts;
-        unsigned long _pulse_timeout;
+        unsigned int  _CF;
+        unsigned int _CF1;
+        unsigned int _SEL;
+        unsigned int _mode;
+        unsigned int  _Interrupts;
+        unsigned int   _timeout;
 };
 #endif
