@@ -68,7 +68,7 @@ void loop()
   client.loop();
   ph = sensorph.get_pH();
   Serial.print("pH: ");
-  Serial.print(sensorph.get_pH());              //Print pH value
+  Serial.print(ph);              //Print pH value
   Serial.print(" (adimensional)  ");
   
 
@@ -92,7 +92,7 @@ void loop()
   Serial.println(" (ms/cm)");
 
   //dtostrf(ec,2,2,msg_out_ec);
-  sprintf(message_buffer,"{\"/water/sensor/measurement/PHO2CE\":{\"pH\":%f,\"o2\":%f,\"ce\":%f}}", ph, o2, ec);
+  sprintf(message_buffer,"{\"pH\":%f,\"o2\":%f,\"ce\":%f}", ph, o2, ec);
   Serial.print(message_buffer);
   client.publish(outTopicwater,message_buffer);
 
