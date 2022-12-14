@@ -21,7 +21,7 @@ water_sensors water(sensor_pin_ph, sensor_pin_o2, sensor_pin_ec);
 
 int currentstate =0;
 
-
+float o2, ph, ec;
 
 void InitWaterSensors()
 {
@@ -58,7 +58,10 @@ int runSwitchCase(int timeMs)        //state machine
     }
     case trafStatesWater::READ_DATA_WATER_SENSORS:
     {
-          water.water_sensors_tasks();      
+          water.water_sensors_tasks();   
+          ph = water.return_pH();  
+          o2 = water.return_O2(); 
+          ec = water.return_EC();
           data_readed = 1;         
           timeout_water_data=0;
           currentstate=1;
@@ -77,4 +80,20 @@ void WaterSensorsTasks()
 int returnWaterSensorsState(int currentstate)
 {
   return currentstate;
+}
+
+
+float getPH()
+{
+  return ph;
+}
+
+float getEC()
+{
+  return ph;
+}
+
+float getO2()
+{
+  return o2;
 }
