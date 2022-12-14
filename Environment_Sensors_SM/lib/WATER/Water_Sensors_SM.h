@@ -6,9 +6,9 @@
 
 
 void InitWaterSensors();
-void runSwitchCase(int timeMs);
+int runSwitchCase(int timeMs);
 void WaterSensorsTasks();
-
+int returnWaterSensorsState(int currentstate);
 
 
 #endif
