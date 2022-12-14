@@ -9,13 +9,12 @@
 
 enum class trafStatesWater : int        //estados
 {
-  stand_By_Water_Sensors,     
-  read_Data_Water_Sensors
+  STAND_BY_WATER_SENSORS,     
+  READ_DATA_WATER_SENSORS
 };
 
-const int WaterDataMs = 1000;             // 1 S
+const int WaterDataMs = 1000;             // 1 segundo timeout
 int lastSwitchTime = 0;
-int nextSwitchInterval = 0;
 
 boolean data_readed;                      //transisitions
 boolean timeout_water_data;
@@ -28,42 +27,40 @@ void InitWaterSensors()
   water.init();                   //initialize water pins
 }
 
-trafStatesWater state = trafStatesWater::stand_By_Water_Sensors;  //initial state
+trafStatesWater state = trafStatesWater::STAND_BY_WATER_SENSORS;  //initial state
 
 void runSwitchCase(int timeMs)        //state machine
 {
 
-  if(timeMs-lastSwitchTime>= WaterDataMs)
+  if(timeout_water_data==1)
   {
-      timeout_water_data=1;
+    state = trafStatesWater::READ_DATA_WATER_SENSORS;
   }
-  else
+  if(data_readed == 1)
   {
-      timeout_water_data=0;
+    state = trafStatesWater::STAND_BY_WATER_SENSORS;
   }
-
+  //Serial.println(timeout_water_data);
+  
   switch(state)
   {
-
-    case trafStatesWater::stand_By_Water_Sensors:
+    case trafStatesWater::STAND_BY_WATER_SENSORS:             
     {
-      if(timeout_water_data==1)          //timeout_water_data
-      {
-          state = trafStatesWater::read_Data_Water_Sensors;
+      if(timeMs-lastSwitchTime>= WaterDataMs)
+        {
           lastSwitchTime = timeMs;
+          timeout_water_data=1;
           data_readed = 0;
-      }
-
+        }
       break;
     }
-    case trafStatesWater::read_Data_Water_Sensors:
+    case trafStatesWater::READ_DATA_WATER_SENSORS:
     {
           water.water_sensors_tasks();      
-          data_readed = 1;            
-          state = trafStatesWater::stand_By_Water_Sensors;
+          data_readed = 1;         
+          timeout_water_data=0;
     }
   }
-
 }
 
 void WaterSensorsTasks()

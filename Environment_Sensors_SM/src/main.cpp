@@ -15,7 +15,7 @@ int sensor_pin_ec = 35;
 
 
 void setup(){
-
+    Serial.begin(115200);
     InitWaterSensors();
 }
 
