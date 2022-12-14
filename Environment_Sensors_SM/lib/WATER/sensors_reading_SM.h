@@ -7,7 +7,7 @@
 
 
 //void check_MQTT
-void runSwitchCase(int timeMs);
+int runSwitchCase(int timeMs);
 void WaterSensorsTasks(); // probably not necessary
 
 
