@@ -31,6 +31,9 @@ int test_wifi_sample=10000;
 int lastPing=0;
 int tempo_int=0;
 bool ping_success;
+unsigned long previousMillis_dis = 0;
+unsigned long interval_dis = 15000;
+unsigned long currentMillis_dis = millis();
 
 
 WiFi_Driver::WiFi_Driver(const char* rede, const char* password){
@@ -100,14 +103,14 @@ void WiFi_Driver::Task(){
         switch (WiFi_State)     //executa o estado atual 
         {
         case trafStatesWiFi::AP_CONNECTED:
-          Serial.println("AP");
+            //Serial.println("AP");
             if (WiFi.status() != WL_CONNECTED){
 
                 evento.no_ap_connection=true;
                 break;
             }
             
-            ping_success = Ping.ping("www.google.com", 3);
+            ping_success = Ping.ping("8.8.8.8", 3);
 
             if(ping_success){
                 evento.internet_connected=true;
@@ -116,7 +119,7 @@ void WiFi_Driver::Task(){
             break;
 
         case trafStatesWiFi::INTERNET_CONNECTED:
-            Serial.println("INT");
+            //Serial.println("INT");
             tempo_int=millis();
             if(tempo_int-lastPing>= test_wifi_sample)
                     {
@@ -130,9 +133,17 @@ void WiFi_Driver::Task(){
             break;
 
         case trafStatesWiFi::DISCONNECTED:
-            Serial.println("DIS");   
-        	WiFi.disconnect();
-			WiFi.begin(ssid, passphrase);
+            //Serial.println("DIS");   
+        	//WiFi.disconnect();
+			//WiFi.begin(ssid, passphrase);
+            currentMillis_dis = millis();
+                
+            if (currentMillis_dis - previousMillis_dis >=interval_dis) {
+                    WiFi.disconnect();
+                    WiFi.reconnect();
+                    previousMillis_dis = currentMillis_dis;
+                }
+
 			if(WiFi.status() == WL_CONNECTED)
             {
 		    evento.ap_connection=true;	
