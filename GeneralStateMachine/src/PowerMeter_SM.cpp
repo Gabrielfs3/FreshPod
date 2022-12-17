@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "power_meter.h"
+#include "PowerMeter_SM.h"
 
 #define UPDATE_TIME                     5000
 
@@ -18,7 +18,7 @@ boolean timeout_consumption_data;
 int lastSwitchTime = 0, currentstate =0;
 
 //definir clases
-power_meter power_SM(CF_PIN,CF1_PIN,SEL_PIN,CURRENT_MODE,relay_PIN);
+PowerMeter power_SM(CF_PIN,CF1_PIN,SEL_PIN,CURRENT_MODE,relay_PIN);
 
 void InitPowerMeter()
 {

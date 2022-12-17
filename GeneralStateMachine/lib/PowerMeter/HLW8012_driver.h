@@ -1,9 +1,9 @@
-#ifndef hlw8012p_h
-#define hlw8012p_h
+#ifndef HLW8012_driver_h
+#define HLW8012_driver_h
 
-class hlw8012p{
+class HLW8012_driver{
     public:
-       hlw8012p();
+       HLW8012_driver();
         void Init(int, int, int, char,int);
         double get_current();
         double get_voltage();
