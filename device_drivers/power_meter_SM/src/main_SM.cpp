@@ -10,10 +10,11 @@
 #define CF1_PIN                         33
 #define CF_PIN                          32
 #define CURRENT_MODE                    LOW
-*/
+
 
 int relay_PIN =18,SEL_PIN=25,CF1_PIN=33,CF_PIN =32;
 char CURRENT_MODE=LOW;
+*/
 
 //global variables
 unsigned long previousMillis = 0;  //will store last time 
