@@ -48,8 +48,8 @@ void Publish_Water()
 /////////Conectar ao MQTT///////
 void MQTT_INIT()
 {
-  client.begin("public.cloud.shiftr.io", net);                //broker mqtt
-  while (!client.connect("TESTETESTE", "public", "public")) {
+  client.begin("public.cloud.shiftr.io", net);                          //broker mqtt
+  while (!client.connect("Esp32FreshPod", "public", "public")) {
   Serial.print(".");
    delay(1000);
   }
@@ -91,30 +91,24 @@ void runSwitchCaseTelemetry(int timeMsTelemetry,const char* WiFi_state)        /
       {
         lastSwitchTimeTelemetry = timeMsTelemetry;
         timeout_water_sensor = 1;
-        //if ((WiFi_state == "INTERNET_CONNECTED") || WiFi_state == "AP_CONNECTED")
-        //{
-        //  MQTT_INIT_NEEDED = 0;
-        //}
-        //else
-        //{
-        //  MQTT_INIT_NEEDED =1;
-        //}
-        //timeout_lum_waterlevel = 1;
-        //timeout_temp_hum = 1;
+
         Serial.println("Standy By Telemetry");
         data_sent = 0;
+      }
+      if(lastWiFiState == "AP_CONNECTED" && WiFi_state == "INTERNET_CONNECTED")
+      {
+        MQTT_INIT();
       }
       break;
     }
     case trafStatesMachine::PUBLISH_DATA:
     {
-      // temos que fazer if aqui vsito que temos 2 funções para ler e 3 timeouts//////////
       Publish_Water();
       data_sent = 1;       
       timeout_water_sensor = 0;
-      Serial.println("Publishing Data");
       //timeout_lum_waterlevel = 0;
       //timeout_temp_hum = 0;
+      Serial.println("Publishing Data");
     }
   }
 
