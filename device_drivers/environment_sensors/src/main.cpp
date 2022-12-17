@@ -1,21 +1,26 @@
 #include <Arduino.h>
-#include "environment_senso.h"
+#include "..\lib\EnvironmentSensors\EnvironmentSensors.h"
+
 
 //variables & GPIO
+#define UPDATE_TIME                     500 // for testing- prints ocorrem 3x a cada sampling da task 
+
+#define environment_sampling            1000 //1sec
+
 //------[DHT11]------
 #define yellow_pin  27
 #define DHTTYPE 11 //modelo do equipamento 
 
-//------[HC_SR04]------
-#define echoPin 12
-#define trigPin 14
+//------[luminousity]------
+#define SCL                             22
+#define SCA                             21
 
 //------[geral]------
 #define baudrate    115200
 //---------------------
 float water,temp, humi;
 
-environment ambi(yellow_pin, DHTTYPE, echoPin, trigPin, baudrate);
+environment ambi(yellow_pin, DHTTYPE, SCL, SCA, baudrate);
 
 void setup() 
 {
@@ -24,22 +29,24 @@ void setup()
 }
 
 void loop() 
-{   Serial.println("Wainting task...");
-    ambi.environment_sensor_tasks();
-    
-    delay(500); // for testing- prints ocorrem 3x a cada sampling da task 
-    Serial.print("\nWater Level? ");
-    water=ambi.return_Watter();
-    Serial.print(water,1);
-    Serial.println(" cm");
+{   
+    static unsigned long previous_time=millis();
+   
+    if (millis()-previous_time > environment_sampling)
+    {
+        Serial.println("environment tasks");
+        ambi.environment_sensor_tasks();
+        previous_time=millis();
+    }
+    static unsigned long last = millis();
 
-    Serial.print("\ntemperature? ");
-    temp= ambi.return_Temp();
-    Serial.print(temp,1);
-    Serial.println(" ºC");
-
-    Serial.print("\nHumidity? ");
-    humi= ambi.return_humi();
-    Serial.print(humi,1);
-    Serial.println(" %\t");
+    if ((millis() - last) > UPDATE_TIME) 
+    {   
+        Serial.println("return values");
+        last = millis();
+        Serial.print(" Luminosity  [LX]    : "); Serial.println(ambi.return_luminousity(),2);
+        Serial.print(" Temperature [ºC]    : "); Serial.println(ambi.return_temperature(),1);
+        Serial.print(" Humidity    [%]     : "); Serial.println(ambi.return_humidity(),1);
+        Serial.println();
+    }
 }

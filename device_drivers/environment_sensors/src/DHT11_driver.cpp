@@ -1,6 +1,6 @@
-#include "DHT.h"
 #include <Arduino.h>
-#include "DHT11_driver.h"
+#include "..\lib\EnvironmentSensors\DHT.h"
+#include "..\lib\EnvironmentSensors\DHT11_driver.h"
 
 //Variaveis globais
 int pino, tipo;
@@ -21,12 +21,12 @@ void DHT11class::Init()
     dht.begin();
 }
 
-float DHT11class::get_Temp()
+float DHT11class::get_temperature()
 {
     return dht.readTemperature();
 }
 
-float DHT11class::get_Humi()
+float DHT11class::get_humidity()
 {
     return dht.readHumidity();
 }
