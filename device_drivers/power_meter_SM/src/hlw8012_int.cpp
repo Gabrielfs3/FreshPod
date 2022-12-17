@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "HLW8012.h"
+#include "../lib\PowerMeter\hlw8012-master\src\HLW8012.h"
 #include "hlw8012p.h"
 
 #define SERIAL_BAUDRATE                 115200
