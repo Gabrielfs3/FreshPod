@@ -15,7 +15,10 @@ boolean data_consumption_readed;
 boolean timeout_consumption_data;
 
 //global variables
-int lastSwitchTime = 0, currentstate =0;
+int lastswitchtimePower = 0, currentstatePower =0;
+
+int relay_PIN =18,SEL_PIN=25,CF1_PIN=33,CF_PIN =32;
+char CURRENT_MODE=LOW;
 
 //definir clases
 PowerMeter power_SM(CF_PIN,CF1_PIN,SEL_PIN,CURRENT_MODE,relay_PIN);
@@ -44,12 +47,12 @@ int runSwitchCase(int timeMs)        //state machine
     switch (state)
     {
     case trafStatesPower::STAND_BY_POWER_METER: 
-      if((timeMs-lastSwitchTime)> UPDATE_TIME)
+      if((timeMs-lastswitchtimePower)> UPDATE_TIME)
           {
-            lastSwitchTime = timeMs;
+            lastswitchtimePower = timeMs;
             timeout_consumption_data=1;
             data_consumption_readed = 0;
-            currentstate =0;
+            currentstatePower =0;
             //Serial.println("ESTADO  0 "); //debug
           }
         break;
@@ -58,24 +61,24 @@ int runSwitchCase(int timeMs)        //state machine
       
       data_consumption_readed = 1; 
       timeout_consumption_data=0;
-      currentstate =1;
+      currentstatePower =1;
       //Serial.println("ESTADO  1 "); //debug
       break;
     }
 
 
-return currentstate;
+return currentstatePower;
 }
 
 void PowerMeterTasks()
 {
   int timeMs = millis();
-  currentstate = runSwitchCase(timeMs);
+  currentstatePower = runSwitchCase(timeMs);
 }
 
-int returnPowerMeterState(int currentstate)
+int returnPowerMeterState(int currentstatePower)
 {
-  return currentstate;
+  return currentstatePower;
 }
 
 float getConsumption()
