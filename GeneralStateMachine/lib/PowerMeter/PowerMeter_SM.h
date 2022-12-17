@@ -1,7 +1,7 @@
-#ifndef Power_Meter_SM_h
-#define Power_Meter_SM_h
+#ifndef PowerMeter_SM_h
+#define PowerMeter_SM_h
 
-#include "power_meter.h"
+#include "PowerMeter.h"
 
 void InitPowerMeter();
 int runSwitchCase();

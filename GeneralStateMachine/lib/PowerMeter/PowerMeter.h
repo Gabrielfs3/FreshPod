@@ -1,12 +1,12 @@
-#ifndef power_meter_h
-#define power_meter_h
+#ifndef PowerMeter_h
+#define PowerMeter_h
 
 extern int CF_PIN,CF1_PIN,SEL_PIN,relay_PIN;
 extern char CURRENT_MODE;
 
-class power_meter{
+class PowerMeter{
     public:
-        power_meter(int, int, int, char ,int);
+        PowerMeter(int, int, int, char ,int);
         void Init();
         void power_task(int);
         float return_energy();

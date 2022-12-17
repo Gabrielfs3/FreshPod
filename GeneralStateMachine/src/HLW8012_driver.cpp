@@ -18,7 +18,7 @@ HLW8012 hlw8012;
 //global variables
 int CF_pin,CF1_pin;
 
-HLW8012_driver::hlw8012p()
+HLW8012_driver::HLW8012_driver()
 {
 
 }
