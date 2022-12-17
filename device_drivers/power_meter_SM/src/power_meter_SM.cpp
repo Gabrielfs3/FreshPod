@@ -50,7 +50,7 @@ int runSwitchCase(int timeMs)        //state machine
             timeout_consumption_data=1;
             data_consumption_readed = 0;
             currentstate =0;
-            //Serial.println("ESTADO  0 "); 
+            //Serial.println("ESTADO  0 "); //debug
           }
         break;
     case trafStatesPower::READ_DATA_POWER_METER:  
@@ -59,7 +59,7 @@ int runSwitchCase(int timeMs)        //state machine
       data_consumption_readed = 1; 
       timeout_consumption_data=0;
       currentstate =1;
-      //Serial.println("ESTADO  1 "); 
+      //Serial.println("ESTADO  1 "); //debug
       break;
     }
 
