@@ -28,7 +28,6 @@ void WATER_SENSORS_INIT()
   ph =0;
   o2=0;
   ec=0;
-
 }
 
 trafStatesWater stateWater = trafStatesWater::STAND_BY_WATER_SENSORS;  //initial state
