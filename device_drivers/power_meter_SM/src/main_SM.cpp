@@ -1,6 +1,6 @@
 #include <Arduino.h>
-#include "Power_Meter_SM.h"
-#include "power_meter.h"
+#include "PowerMeter_SM.h"
+#include "PowerMeter.h"
 
 #define SERIAL_BAUDRATE                 115200
 /*

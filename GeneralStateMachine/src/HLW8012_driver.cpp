@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include "../lib\PowerMeter\hlw8012-master\src\HLW8012.h"
-#include "hlw8012p.h"
+#include "HLW8012_driver.h"
 
 #define SERIAL_BAUDRATE                 115200
 
@@ -18,14 +18,14 @@ HLW8012 hlw8012;
 //global variables
 int CF_pin,CF1_pin;
 
-hlw8012p::hlw8012p()
+HLW8012_driver::hlw8012p()
 {
 
 }
 
 void setInterrupts() ;
 
-void hlw8012p::Init(int CF, int CF1, int SEL, char mode,int relay)
+void HLW8012_driver::Init(int CF, int CF1, int SEL, char mode,int relay)
 {  
     _CF=CF;
     _CF1=CF1;
@@ -78,27 +78,27 @@ void setInterrupts()
 }
 //------------------------------------
 
-double hlw8012p::get_current()
+double HLW8012_driver::get_current()
 {
     return hlw8012.getCurrent();
 }
 
-double hlw8012p::get_voltage()
+double HLW8012_driver::get_voltage()
 {
     return hlw8012.getVoltage();
 }
 
-double hlw8012p::get_power()
+double HLW8012_driver::get_power()
 {
     return hlw8012.getActivePower();
 }
 
-double hlw8012p::get_Energy()
+double HLW8012_driver::get_Energy()
 {
     return hlw8012.getEnergy();
 }
 
-void hlw8012p::reset_energy()
+void HLW8012_driver::reset_energy()
 {
     hlw8012.resetEnergy();
 }
