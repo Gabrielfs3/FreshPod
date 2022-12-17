@@ -8,16 +8,11 @@
 #include "../lib/ChemicalSensors/SensorO2.h"
 #include "../lib/WATER/WaterSensors.h"
 #include "../lib/WATER/Water_Sensors_SM.h"
-//#include environment sensors
-////////////net casa filipe///////////////
-//const char* ssid = "Vodafone-614286";
-//const char* pass = "pdz7bZeF3g";
-//////////////////////////////////////////
+
 
 WiFiClient net;
 MQTTClient client;
 
-//Wifi_esp32 wifi_esp32(ssid,pass);
 
 enum class trafStatesMachine : int        //estados
 {
