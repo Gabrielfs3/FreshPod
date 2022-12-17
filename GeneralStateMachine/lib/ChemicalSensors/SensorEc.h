@@ -1,19 +1,19 @@
-#ifndef sensorph_h
-#define sensorph_h
+#ifndef SensorEc_h
+#define SensorEc_h
 
-class sensorpH
+class SensorEc
 {
     public:
-        sensorpH(int pin);
+        SensorEc(int pin);
         void init();
-        float get_pH();
+        float get_ec();
     
     private:
-        float ph_Value;
-        int pin_ph;
+        float ec_Value;
+        int pin_ec;
         unsigned long int avgValue;                         //Store the average value of the sensor feedback
         float b;
-        int buf[10],ph;
+        int buf[10],e_c;
 };
 
 #endif

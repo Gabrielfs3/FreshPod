@@ -1,7 +1,7 @@
 #ifndef Water_Sensors_SM_h
 #define Water_Sensors_SM_h
 
-#include "../lib/WATER/water_sensors.h"
+#include "../lib/WATER/WaterSensors.h"
 
 void WATER_SENSORS_INIT();
 int runSwitchCaseWater(int timeMs);

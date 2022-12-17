@@ -1,12 +1,12 @@
 #include <Arduino.h>
 #include <MQTT.h>
 #include <WiFi.h>
-#include "Wifi_esp32.h"
+#include "WifiEsp32.h"
 
-#include "../lib/WATER/sensor_ph.h"
-#include "../lib/WATER/sensor_ec.h"
-#include "../lib/WATER/sensor_o2.h"
-#include "../lib/WATER/water_sensors.h"
+#include "../lib/ChemicalSensors/SensorEc.h"
+#include "../lib/ChemicalSensors/SensorPh.h"
+#include "../lib/ChemicalSensors/SensorO2.h"
+#include "../lib/WATER/WaterSensors.h"
 #include "../lib/WATER/Water_Sensors_SM.h"
 //#include environment sensors
 ////////////net casa filipe///////////////

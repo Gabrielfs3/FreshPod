@@ -1,18 +1,18 @@
 #include <Arduino.h>
-#include "sensor_ph.h"
+#include "SensorPh.h"
 
 
-sensorpH::sensorpH(int pin)
+SensorPh::SensorPh(int pin)
 {
     pin_ph=pin;
 }
 
-void sensorpH::init()
+void SensorPh::init()
 {
     pinMode(pin_ph,INPUT);
 }
 
-float sensorpH::get_pH()
+float SensorPh::get_ph()
 {
     for(int i=0;i<10;i++)                           //Get 10 sample value from the sensor for smooth the value
     { 

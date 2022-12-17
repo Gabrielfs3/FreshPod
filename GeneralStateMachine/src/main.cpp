@@ -1,12 +1,12 @@
 #include <Arduino.h>
 
-#include "../lib/WATER/sensor_ph.h"
-#include "../lib/WATER/sensor_ec.h"
-#include "../lib/WATER/sensor_o2.h"
-#include "../lib/WATER/water_sensors.h"
-#include "../lib/WATER/Water_Sensors_SM.h"
-#include "../lib/TELEMETRY/Telemetry_SM.h"
-#include "../lib/TELEMETRY/WiFi_Driver.h"
+#include "SensorEc.h"
+#include "SensorPh.h"
+#include "SensorO2.h"
+#include "WaterSensors.h"
+#include "Water_Sensors_SM.h"
+#include "Telemetry_SM.h"
+#include "WiFi_Driver.h"
 
 int sensor_pin_ph = 33;
 int sensor_pin_o2= 32;

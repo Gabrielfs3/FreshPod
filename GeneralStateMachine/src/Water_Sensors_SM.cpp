@@ -1,7 +1,6 @@
 #include <Arduino.h>
 
-
-#include "../lib/WATER/water_sensors.h"
+#include "../lib/WATER/WaterSensors.h"
 #include "../lib/WATER/Water_Sensors_SM.h"
 
 
@@ -17,7 +16,7 @@ int lastSwitchTime = 0;
 boolean data_readed;                      //transisitions
 boolean timeout_water_data;
 
-water_sensors water(sensor_pin_ph, sensor_pin_o2, sensor_pin_ec);
+WaterSensors water(sensor_pin_ph, sensor_pin_o2, sensor_pin_ec);
 
 int currentstate =0;
 
@@ -64,9 +63,9 @@ int runSwitchCaseWater(int timeMs)        //state machine
     case trafStatesWater::READ_DATA_WATER_SENSORS:
     {
           water.water_sensors_tasks();   
-          //ph = water.return_pH();  
-          //o2 = water.return_O2(); 
-          //ec = water.return_EC();
+          //ph = water.return_ph();  
+          //o2 = water.return_o2(); 
+          //ec = water.return_ec();
           ph++;
           o2++;
           ec++;

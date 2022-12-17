@@ -1,18 +1,18 @@
 #include <Arduino.h>
-#include "sensor_o2.h"
+#include "SensorO2.h"
 
 
-sensorO2::sensorO2(int pin)
+SensorO2::SensorO2(int pin)
 {
     pin_o2=pin;
 }
 
-void sensorO2::init()
+void SensorO2::init()
 {
     pinMode(pin_o2,OUTPUT);
 }
 
-float sensorO2::get_O2()
+float SensorO2::get_o2()
 {
     for(int i=0;i<10;i++)                                   //Get 10 sample value from the sensor for smooth the value
     { 

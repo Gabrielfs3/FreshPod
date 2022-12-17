@@ -1,5 +1,0 @@
-#include <Arduino.h>
-#include <WiFi.h>
-#include <MQTT.h>
-
-#include <C:/Users/filip/Desktop/FreshPod-main/FreshPod-main/device_drivers/drivers_wifi/include/Wifi_esp32.h>

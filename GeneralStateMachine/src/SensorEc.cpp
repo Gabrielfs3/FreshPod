@@ -1,19 +1,18 @@
 #include <Arduino.h>
-#include "sensor_ec.h"
+#include "SensorEc.h"
 
 
-sensorEC::sensorEC(int pin)
+SensorEc::SensorEc(int pin)
 {
     pin_ec=pin;
 }
 
-
-void sensorEC::init()
+void SensorEc::init()
 {
     pinMode(pin_ec,OUTPUT);
 }
 
-float sensorEC::get_EC()
+float SensorEc::get_ec()
 {
    for(int i=0;i<10;i++)                               //Get 10 sample value from the sensor for smooth the value
     { 

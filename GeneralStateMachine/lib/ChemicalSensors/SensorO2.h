@@ -1,13 +1,13 @@
-#ifndef sensoro2_h
-#define sensoro2_h
+#ifndef SensorO2_h
+#define SensorO2_h
 
 
-class sensorO2
+class SensorO2
 {
     public:
-        sensorO2(int pin);
+        SensorO2(int pin);
         void init();
-        float get_O2();
+        float get_o2();
     
     private:
         float o2_Value;
