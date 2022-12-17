@@ -3,8 +3,8 @@
 
 #include "../lib/WATER/water_sensors.h"
 
-void InitWaterSensors();
-int runSwitchCase(int timeMs);
+void WATER_SENSORS_INIT();
+int runSwitchCaseWater(int timeMs);
 void WaterSensorsTasks();
 int returnWaterSensorsState(int currentstate);
 float getPH();

@@ -23,27 +23,31 @@ int currentstate =0;
 
 float o2, ph, ec;
 
-void InitWaterSensors()
+void WATER_SENSORS_INIT()
 {
   water.init();                   //initialize water pins
+  ph =0;
+  o2=0;
+  ec=0;
+
 }
 
-trafStatesWater state = trafStatesWater::STAND_BY_WATER_SENSORS;  //initial state
+trafStatesWater stateWater = trafStatesWater::STAND_BY_WATER_SENSORS;  //initial state
 
-int runSwitchCase(int timeMs)        //state machine
+int runSwitchCaseWater(int timeMs)        //state machine
 {
 
   if(timeout_water_data==1)
   {
-    state = trafStatesWater::READ_DATA_WATER_SENSORS;
+    stateWater = trafStatesWater::READ_DATA_WATER_SENSORS;
   }
   if(data_readed == 1)
   {
-    state = trafStatesWater::STAND_BY_WATER_SENSORS;
+    stateWater = trafStatesWater::STAND_BY_WATER_SENSORS;
   }
   //Serial.println(timeout_water_data);
   
-  switch(state)
+  switch(stateWater)
   {
     case trafStatesWater::STAND_BY_WATER_SENSORS:             
     {
@@ -53,15 +57,26 @@ int runSwitchCase(int timeMs)        //state machine
           timeout_water_data=1;
           data_readed = 0;
           currentstate =0;
+          Serial.println("Stand By Water");
         }
       break;
     }
     case trafStatesWater::READ_DATA_WATER_SENSORS:
     {
           water.water_sensors_tasks();   
-          ph = water.return_pH();  
-          o2 = water.return_O2(); 
-          ec = water.return_EC();
+          //ph = water.return_pH();  
+          //o2 = water.return_O2(); 
+          //ec = water.return_EC();
+          ph++;
+          o2++;
+          ec++;
+          if(ph == 10)
+          {
+            ph =0;
+            o2=0;
+            ec=0;
+          }
+          Serial.println("Reading Data Water");
           data_readed = 1;         
           timeout_water_data=0;
           currentstate=1;
@@ -74,7 +89,7 @@ int runSwitchCase(int timeMs)        //state machine
 void WaterSensorsTasks()
 {
   int timeMs = millis();
-  currentstate = runSwitchCase(timeMs);
+  currentstate = runSwitchCaseWater(timeMs);
 }
 
 int returnWaterSensorsState(int currentstate)
