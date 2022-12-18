@@ -1,22 +1,22 @@
 #include <Arduino.h>
-#include "hc_sr04.h"
+#include "HC_SR04_driver.h"
 
 // defines variables
 long duration;
 float distance;
 
- hc_sr04:: hc_sr04(int pinx, int piny)
+ HC_SR04_driver:: HC_SR04_driver(int pinx, int piny)
 {
     echoPin=pinx;
     trigPin=piny;
 }
-void hc_sr04::Init()
+void HC_SR04_driver::Init()
 {
     pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
     pinMode(echoPin, INPUT); // Sets the echoPin as an Input
 }
 
-float hc_sr04::get_dist()
+float HC_SR04_driver::get_dist()
 {
     digitalWrite(trigPin, LOW);
     delayMicroseconds(2);

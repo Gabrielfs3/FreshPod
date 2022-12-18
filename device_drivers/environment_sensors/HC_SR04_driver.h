@@ -1,12 +1,11 @@
-#ifndef hc_sr04_h
-#define hc_sr04_h
-
+#ifndef HC_SR04_driver_h
+#define HC_SR04_driver_h
 
 #include "Arduino.h"
 
-class hc_sr04{
+class HC_SR04_driver{
     public:
-        hc_sr04(int, int);
+        HC_SR04_driver(int, int);
         void Init();
         float get_dist();
     private:
