@@ -62,7 +62,7 @@ int runSwitchCase(int timeMs_ambi)        //state machine
             timeout_environment_data=1;
             data_environment_readed = 0;
             currentstateEnvironment =0;
-            Serial.println("ESTADO  0 "); //debug
+            //Serial.println("ESTADO  0 "); //debug
           }
         break;
     case trafStatesEnvironment::READ_DATA_ENVIRONMENT_SENSORS:  
@@ -70,7 +70,7 @@ int runSwitchCase(int timeMs_ambi)        //state machine
         data_environment_readed = 1; 
         timeout_environment_data=0;
         currentstateEnvironment =1;
-        Serial.println("ESTADO  1 "); //debug
+        //Serial.println("ESTADO  1 "); //debug
       break;
     }
 
