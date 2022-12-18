@@ -6,7 +6,7 @@
 void InitPowerMeter();
 int runSwitchCase();
 void PowerMeterTasks();
-int returnPowerMeterState(int currentstate);
+int returnPowerMeterState(int currentstatePower);
 float getConsumption();
 
 #endif
