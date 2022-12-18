@@ -31,7 +31,7 @@ void InitPowerMeter()
 //initial state
 trafStatesPower state = trafStatesPower::STAND_BY_POWER_METER; 
 
-int runSwitchCase(int timeMs)        //state machine
+int runPowerSwitchCase(int timeMs)        //state machine
 {
 
     if(timeout_consumption_data==1)
@@ -73,7 +73,7 @@ return currentstatePower;
 void PowerMeterTasks()
 {
   int timeMs = millis();
-  currentstatePower = runSwitchCase(timeMs);
+  currentstatePower = runPowerSwitchCase(timeMs);
 }
 
 int returnPowerMeterState(int currentstatePower)

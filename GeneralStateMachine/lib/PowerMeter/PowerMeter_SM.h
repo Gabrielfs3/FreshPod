@@ -4,7 +4,7 @@
 #include "PowerMeter.h"
 
 void InitPowerMeter();
-int runSwitchCase();
+int runPowerSwitchCase();
 void PowerMeterTasks();
 int returnPowerMeterState(int currentstatePower);
 float getConsumption();

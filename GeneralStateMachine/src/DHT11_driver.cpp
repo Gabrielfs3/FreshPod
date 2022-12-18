@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "..\lib\EnvironmentSensors\DHT.h"
+#include "..\lib\EnvironmentSensors\Grove_Sensor\DHT.h"
 #include "..\lib\EnvironmentSensors\DHT11_driver.h"
 
 //Variaveis globais
