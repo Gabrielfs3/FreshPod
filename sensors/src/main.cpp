@@ -21,19 +21,19 @@ const char* outTopicph = "/pH";
 const char* outTopico2 = "/o2";
 const char* outTopicec = "/ec";
 const char* outTopicwater = "/water/sensor/measurement/PHO2CE";
-char message_buffer[150];
+char message_buffer[1024];
 float o2;
 float ph;
 float ec;
-int monthDay;
-int CurrentMonth;
-int CurrentYear;
-String CurrentMonthName;
-String formattedDate;
-String FormattedDay;
-String CurrentDate;
-String weekDays[7]={"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-String months[12]={"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+long int TimeStamp_o2;
+long int Timestamp_ph;
+long int Timestamp_ec;
+//String CurrentMonthName;
+//String formattedDate;
+//String FormattedDay;
+//String CurrentDate;
+//String weekDays[7]={"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+//String months[12]={"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 
 
 WiFiClient espclient;
@@ -80,66 +80,78 @@ void loop()
     reconnect();
   }
   timeClient.update(); // get the current date and time from the NTP server.
-  time_t epochTime = timeClient.getEpochTime(); //number of seconds that have elapsed since January 1, 1970 (midnight GMT);
+  //epochTime = timeClient.getEpochTime(); //number of seconds that have elapsed since January 1, 1970 (midnight GMT);
 
-  struct tm *ptm = gmtime((time_t*)&epochTime); //The NTP Client doesn’t come with functions to get the date. So, we need to create a time structure (struct tm) and then, access its elements to get information about the date
-  monthDay=ptm->tm_mday; //tm_mday dia do mes
-  CurrentMonth=ptm->tm_mon+1; // tm_mon meses desde janeiro. Adicionamos 1 pq começa em 0 e assim o 1 corresponde a janeiro e 2 a fevereiro etc
-  CurrentMonthName=months[CurrentMonth-1]; //subtraimos 1 pq o prieiro indice é zero
-  CurrentYear=ptm->tm_year+1900; //tm_year anos desde 1900
-  CurrentDate=String(monthDay) + '/' + String(CurrentMonth) + '/' + String(CurrentYear);
+  //struct tm *ptm = gmtime((time_t*)&epochTime); //The NTP Client doesn’t come with functions to get the date. So, we need to create a time structure (struct tm) and then, access its elements to get information about the date
+  //monthDay=ptm->tm_mday; //tm_mday dia do mes
+  //CurrentMonth=ptm->tm_mon+1; // tm_mon meses desde janeiro. Adicionamos 1 pq começa em 0 e assim o 1 corresponde a janeiro e 2 a fevereiro etc
+  //CurrentMonthName=months[CurrentMonth-1]; //subtraimos 1 pq o prieiro indice é zero
+  //CurrentYear=ptm->tm_year+1900; //tm_year anos desde 1900
+  //CurrentDate=String(monthDay) + '/' + String(CurrentMonth) + '/' + String(CurrentYear);
 
   client.loop();
   ph = sensorph.get_pH();
-  formattedDate = timeClient.getFormattedTime();
+  //formattedDate = timeClient.getFormattedTime();
+  Timestamp_ph = timeClient.getEpochTime();
   Serial.print("pH: ");
   Serial.print(ph);              //Print pH value
   Serial.print(" (adimensional)  ");
-  Serial.print("Day: ");
-  Serial.print(CurrentDate);
-  Serial.print(" Hour: ");
-  Serial.print(formattedDate);
+  Serial.print(" Time: ");
+  Serial.print(Timestamp_ph);
   Serial.print("\n");
+ // Serial.print("Day: ");
+ //Serial.print(CurrentDate);
+ //Serial.print(" Hour: ");
+ //Serial.print(formattedDate);
+ //Serial.print("\n");
   
 
   //dtostrf(ph,2,2,msg_out_ph);
  
   o2 = sensoro2.get_O2();
-  formattedDate = timeClient.getFormattedTime();
+  TimeStamp_o2 = timeClient.getEpochTime();
+  //formattedDate = timeClient.getFormattedTime();
   Serial.print("O2: ");
   Serial.print(o2);              //Print O2 value
   Serial.print(" (mg/L)  ");
-  Serial.print(" Day: ");
-  Serial.print(CurrentDate);
-  Serial.print(" Hour: ");
-  Serial.print(formattedDate);
+  Serial.print(" Time: ");
+  Serial.print(TimeStamp_o2);
   Serial.print("\n");
+
+  //Serial.print(" Day: ");
+  //Serial.print(CurrentDate);
+  //Serial.print(" Hour: ");
+  //Serial.print(formattedDate);
+  //Serial.print("\n");
   
 
   //dtostrf(o2,2,2,msg_out_o2);
 
   Serial.print("EC: ");
   ec = sensorec.get_EC();
-  formattedDate = timeClient.getFormattedTime();
+  Timestamp_ec = timeClient.getEpochTime();
   if (ec <1 || ec > 15)
   {
       Serial.print("Valor fora da gama recomendada! ");
-      Serial.print("Day: ");
-      Serial.print(CurrentDate);
-      Serial.print(" Hour: ");
-      Serial.print(formattedDate);
+      //Serial.print("Day: ");
+      //Serial.print(CurrentDate);
+      Serial.print(" Time: ");
+      Serial.print(Timestamp_ec);
       Serial.print("\n");
   }
+  else{
   Serial.print(ec);              //Print EC value
   Serial.println(" (ms/cm)");
-  Serial.print("Day: ");
-  Serial.print(CurrentDate);
-  Serial.print(" Hour: ");
-  Serial.print(formattedDate);
+  Serial.print(" Time: ");
+  Serial.print(Timestamp_ec);
+  //Serial.print(" Hour: ");
+  //Serial.print(formattedDate);
   Serial.print("\n");
+  }
 
   //dtostrf(ec,2,2,msg_out_ec);
-  sprintf(message_buffer,"{\"pH\":%f,\"o2\":%f,\"ce\":%f}", ph, o2, ec);
+  //sprintf(message_buffer,"{\"pH\":%f,\"o2\":%f,\"ce\":%f}", ph, o2, ec);
+  sprintf(message_buffer,"{\"pH\":{\"timestamp\":%ld,\"value\":%f},\"o2\":{\"timestamp\":%ld,\"value\":%f},\"ec\":{\"timestamp\":%ld,\"value\":%f}}", Timestamp_ph, ph, TimeStamp_o2 , o2, Timestamp_ec, ec);
   //Serial.print(message_buffer);
   client.publish(outTopicwater,message_buffer);
 
