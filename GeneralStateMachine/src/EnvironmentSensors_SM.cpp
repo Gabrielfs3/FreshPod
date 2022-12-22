@@ -20,6 +20,8 @@ boolean timeout_environment_data;
 //global variables
 int lastswitchtimeEnvironment = 0, currentstateEnvironment =0;
 
+long int TS_Lumi, TS_Temp, TS_Humi;
+
 //GPIOS
 //------[DHT11]------
 #define yellow_pin  27
@@ -67,6 +69,11 @@ int runSwitchCase(int timeMs_ambi)        //state machine
         break;
     case trafStatesEnvironment::READ_DATA_ENVIRONMENT_SENSORS:  
         ambi.environment_sensor_tasks();
+
+        TS_Lumi=ambi.return_TS_lumi();
+        TS_Temp=ambi.return_TS_temp();
+        TS_Humi=ambi.return_TS_humi();
+        
         data_environment_readed = 1; 
         timeout_environment_data=0;
         currentstateEnvironment =1;
@@ -102,4 +109,16 @@ float getHumidity()
     return ambi.return_humidity();
 }
 
+long int get_ts_luminousity()
+{
+  return TS_Lumi;
+}
 
+long int get_ts_temperature()
+{
+return TS_Temp;
+}
+long int get_ts_humidity()
+{
+  return TS_Humi;
+}

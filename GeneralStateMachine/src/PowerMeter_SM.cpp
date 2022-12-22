@@ -16,7 +16,9 @@ boolean timeout_consumption_data;
 
 //global variables
 int lastswitchtimePower = 0, currentstatePower =0;
+long int TS_Consumption;
 
+//-------GPIO'S
 int relay_PIN =18,SEL_PIN=25,CF1_PIN=33,CF_PIN =32;
 char CURRENT_MODE=LOW;
 
@@ -58,7 +60,7 @@ int runPowerSwitchCase(int timeMs)        //state machine
         break;
     case trafStatesPower::READ_DATA_POWER_METER:  
       power_SM.power_task(UPDATE_TIME);
-      
+      TS_Consumption=power_SM.return_TS_power();
       data_consumption_readed = 1; 
       timeout_consumption_data=0;
       currentstatePower =1;
@@ -84,4 +86,10 @@ int returnPowerMeterState(int currentstatePower)
 float getConsumption()
 {
     return power_SM.return_energy();
+}
+
+
+long int get_ts_consumption()
+{
+  return TS_Consumption;
 }

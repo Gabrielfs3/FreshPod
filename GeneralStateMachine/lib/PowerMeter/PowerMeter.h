@@ -10,6 +10,7 @@ class PowerMeter{
         void Init();
         void power_task(int);
         float return_energy();
+        long int return_TS_power();
     private:
         unsigned int _cf_pin;
         unsigned int _cf1_pin;

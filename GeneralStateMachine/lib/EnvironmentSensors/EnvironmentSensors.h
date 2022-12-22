@@ -11,6 +11,10 @@ class environment{
         float return_luminousity();
         float return_temperature ();
         float return_humidity();
+        long int return_TS_lumi();
+        long int return_TS_temp();
+        long int return_TS_humi();
+
     private:
         int yellow_pin;
         int type;

@@ -9,4 +9,6 @@ void PowerMeterTasks();
 int returnPowerMeterState(int currentstatePower);
 float getConsumption();
 
+long int get_ts_consumption(); 
+
 #endif

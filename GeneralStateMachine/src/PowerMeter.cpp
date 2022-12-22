@@ -2,6 +2,8 @@
 #include "PowerMeter.h"
 #include "HLW8012_driver.h"
 
+#include <NTPClient.h>
+#include <WiFiUdp.h>
 
 #define SERIAL_BAUDRATE                 115200
 
@@ -9,8 +11,13 @@
 static float power, convert, consumo=0.0, return_consumo=0.0;
 static float ener;
 int sampling;
+long int TimeStamp_power;
+
 //define class
 HLW8012_driver hlw8012pm;
+
+WiFiUDP ntpUDP__Power;
+NTPClient timeClient_Power(ntpUDP__Power);
 
 //define functions
 void energy();
@@ -34,6 +41,7 @@ void PowerMeter::power_task(int time)
 {   
     sampling=time;
     power=hlw8012pm.get_power();
+    TimeStamp_power=timeClient_Power.getEpochTime();
     //ener=hlw8012pm.get_Energy();
     energy();
 }
@@ -57,3 +65,8 @@ float PowerMeter::return_energy()
     consumo=0;//reset consumo
     return return_consumo;
 } 
+
+long int  PowerMeter::return_TS_power()
+{
+    return TimeStamp_power;
+}
