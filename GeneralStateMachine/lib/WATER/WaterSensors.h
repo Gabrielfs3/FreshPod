@@ -13,6 +13,9 @@ class WaterSensors{
         float return_ph();
         float return_o2 ();
         float return_ec ();
+        long int return_TS_ph();
+        long int return_TS_o2();
+        long int return_TS_ec();
     private:
         float ph, o2, ec;
         int pin;

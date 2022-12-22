@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <MQTT.h>
 #include <WiFi.h>
+#include <PubSubClient.h>
 #include "WifiEsp32.h"
 
 #include "../lib/ChemicalSensors/SensorEc.h"
@@ -11,7 +12,9 @@
 
 
 WiFiClient net;
-MQTTClient client;
+PubSubClient client(net);
+//MQTTClient client;
+
 
 
 enum class trafStatesMachine : int        //estados
@@ -31,28 +34,50 @@ boolean MQTT_INIT_NEEDED;
 
 
 float Pub_ec1,Pub_O2,Pub_pH;
+long int Pub_TS_ph, Pub_TS_o2, Pub_TS_ec;
 char message_buffer[150];
+const char* broker = "192.168.1.122";
 const char* outTopicwater = "/water/sensor/measurement/PHO2CE";
 const char* lastWiFiState = "DISCONNECTED";
 
 void Publish_Water()
 {
       Pub_pH = getPH();
+      Pub_TS_ph = get_TS_ph();
       Pub_ec1 = getEC();
+      Pub_TS_ec = get_TS_ec();
       Pub_O2 = getO2();
+      Pub_TS_o2 = get_TS_o2();
 
-        sprintf(message_buffer,"{\"pH\":%f,\"o2\":%f,\"ce\":%f}", Pub_pH, Pub_O2, Pub_ec1);
+        //sprintf(message_buffer,"{\"pH\":%f,\"o2\":%f,\"ce\":%f}", Pub_pH, Pub_O2, Pub_ec1);
+        sprintf(message_buffer,"{\"pH\":{\"timestamp\":%ld,\"value\":%f},\"o2\":{\"timestamp\":%ld,\"value\":%f},\"ec\":{\"timestamp\":%ld,\"value\":%f}}", Pub_TS_ph, Pub_pH, Pub_TS_o2 , Pub_O2, Pub_TS_ec, Pub_ec1);
         client.publish(outTopicwater,message_buffer);
+      
   
 }
 /////////Conectar ao MQTT///////
 void MQTT_INIT()
 {
-  client.begin("public.cloud.shiftr.io", net);                          //broker mqtt
-  while (!client.connect("Esp32FreshPod", "public", "public")) {
-  Serial.print(".");
-   delay(1000);
+  //client.begin(broker, net);                          //broker mqtt
+  client.setServer(broker,1883);
+  //while (!client.connect("Esp32FreshPod", "public", "public")) {
+  //Serial.print(".");
+  // delay(1000);
+  //}
+   while(!client.connected()) 
+ {
+  Serial.print("\nConnected to");
+  Serial.println(broker);
+  if(client.connect("400"))
+  {
+    Serial.print("\nConnected to");
+    Serial.println(broker);
+  }else
+  {
+    Serial.println("\nTrying connect again");
+    delay(5000);
   }
+ }
   Serial.println("\nconnected to mqtt broker!");
   MQTT_INIT_NEEDED=0;
 }

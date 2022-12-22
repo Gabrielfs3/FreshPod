@@ -13,8 +13,8 @@ int sensor_pin_ph = 33;
 int sensor_pin_o2= 32;
 int sensor_pin_ec = 35;
 
-const char* rede = "Vodafone-614286";
-const char* password = "pdz7bZeF3g";
+const char* rede = "Vodafone-624E88";
+const char* password = "xGJXZcg7Jd";
 
 WiFi_Driver wifi_esp(rede,password);
 
@@ -35,5 +35,4 @@ void loop()
   const char* WiFi_state = wifi_esp.return_wifi_state ();
   Serial.println(wifi_esp.return_wifi_state ());
   MQTT_TASKS(WiFi_state);
- 
 }
