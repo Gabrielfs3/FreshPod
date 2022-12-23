@@ -30,7 +30,7 @@ enum class trafStatesMachine : int        //estados
 const int DataMsTelemetry = 1000;             //Apagar
 
 const int DataMsTelemetry_Water = (1000);          // 1 sec timeout ---alterar
-const int DataMsTelemetry_Environment = 30000;        // 30 segundos timeout
+const int DataMsTelemetry_Environment = 10000;        // 10 segundos timeout---aletrar para 30
 const int DataMsTelemetry_Power = 60000;              // 1 min timeout
 
 
