@@ -8,7 +8,7 @@
 #define SERIAL_BAUDRATE                 115200
 
 //global variables
-static float power, convert, consumo=0.0, return_consumo=0.0;
+static float power, convert, consumo, return_consumo;
 static float ener;
 int sampling;
 long int TimeStamp_power;
@@ -33,6 +33,7 @@ PowerMeter::PowerMeter(int cf, int cf1, int sel, char current_mode,int _relay)
 
 void PowerMeter::Init()
 {
+    timeClient_Power.update();
     Serial.begin(SERIAL_BAUDRATE);
     hlw8012pm.Init(_cf_pin,_cf1_pin,_sel_pin, _current_mode_,_relay_);
 }

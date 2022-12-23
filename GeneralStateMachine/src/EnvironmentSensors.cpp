@@ -40,6 +40,7 @@ DHT11class DHT11(_yellow_pin,_type);
 void environment::Init()
 {
     Serial.begin(baudrate);
+    timeClient_Environment.update();
     luxs.Init();
     DHT11.Init();
 }
