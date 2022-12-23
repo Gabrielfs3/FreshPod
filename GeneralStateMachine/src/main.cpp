@@ -13,6 +13,8 @@
 int sensor_pin_ph = 33;
 int sensor_pin_o2= 32;
 int sensor_pin_ec = 35;
+int sensor_pin_pin_echo = 12;
+int sensor_pin_pin_trig = 14;
 
 const char* rede = "Vodafone-624E88";
 const char* password = "xGJXZcg7Jd";

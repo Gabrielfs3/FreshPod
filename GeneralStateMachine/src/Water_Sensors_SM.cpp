@@ -16,19 +16,20 @@ int lastSwitchTime = 0;
 boolean data_readed;                      //transisitions
 boolean timeout_water_data;
 
-WaterSensors water(sensor_pin_ph, sensor_pin_o2, sensor_pin_ec);
+WaterSensors water(sensor_pin_ph, sensor_pin_o2, sensor_pin_ec, sensor_pin_pin_echo, sensor_pin_pin_trig);
 
 int currentstate =0;
 
-float o2, ph, ec;
-long int TS_ph, TS_o2, TS_ec;
+float o2, ph, ec, water_level;
+long int TS_ph, TS_o2, TS_ec, TS_water_level;
 
 void WATER_SENSORS_INIT()
 {
   water.init();                   //initialize water pins
-  ph =0;
-  o2=0;
-  ec=0;
+  ph = 0;
+  o2 = 0;
+  ec = 0;
+  water_level = 0;
 }
 
 trafStatesWater stateWater = trafStatesWater::STAND_BY_WATER_SENSORS;  //initial state
@@ -69,6 +70,8 @@ int runSwitchCaseWater(int timeMs)        //state machine
           TS_o2 = water.return_TS_o2(); 
           ec = water.return_ec();
           TS_ec = water.return_TS_ec();
+          water_level = water.return_water_level();
+          TS_water_level = water.return_TS_water_level();          
           /*ph++;
           o2++;
           ec++;
@@ -107,12 +110,17 @@ float getPH()
 
 float getEC()
 {
-  return ph;
+  return ec;
 }
 
 float getO2()
 {
   return o2;
+}
+
+float getwl()
+{
+  return water_level;
 }
 
 long int get_TS_ph()
@@ -130,3 +138,7 @@ long int get_TS_ec()
   return TS_ec;
 }
 
+long int get_TS_water_level()
+{
+  return TS_water_level;
+}

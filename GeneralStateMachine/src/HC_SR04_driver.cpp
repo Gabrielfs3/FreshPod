@@ -10,6 +10,7 @@ float distance;
     echoPin=pinx;
     trigPin=piny;
 }
+
 void HC_SR04_driver::Init()
 {
     pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
