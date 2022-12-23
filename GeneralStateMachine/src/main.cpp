@@ -16,10 +16,13 @@ int sensor_pin_ec = 35;
 int sensor_pin_pin_echo = 12;
 int sensor_pin_pin_trig = 14;
 
+
 const char* rede = "Vodafone-624E88";
 const char* password = "xGJXZcg7Jd";
 
+
 WiFi_Driver wifi_esp(rede,password);
+
 
 void setup()
 {
@@ -29,12 +32,10 @@ void setup()
     InitEnvironmentSensors();
     InitPowerMeter();
     MQTT_INIT();
-   
 }
 
 void loop() 
 {
-  
   WaterSensorsTasks();
   EnvironmentTasks();
   PowerMeterTasks();

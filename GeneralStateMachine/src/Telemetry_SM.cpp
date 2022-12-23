@@ -20,7 +20,6 @@ PubSubClient client(net);
 //MQTTClient client;
 
 
-
 enum class trafStatesMachine : int        //estados
 {
   STAND_BY,     
@@ -33,7 +32,6 @@ const int DataMsTelemetry = 1000;             //Apagar
 const int DataMsTelemetry_Water = (1000);          // 1 sec timeout ---alterar
 const int DataMsTelemetry_Environment = 10000;        // 10 segundos timeout---aletrar para 30
 const int DataMsTelemetry_Power = 60000;              // 1 min timeout
-
 
 
 boolean data_sent;                      //transisitions
