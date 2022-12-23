@@ -10,8 +10,10 @@ int returnWaterSensorsState(int currentstate);
 float getPH();
 float getO2();
 float getEC();
+float getWL();
 long int get_TS_ph();
 long int get_TS_o2();
 long int get_TS_ec();
+long int get_TS_water_level();
 
 #endif

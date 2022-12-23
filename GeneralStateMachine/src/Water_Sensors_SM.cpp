@@ -118,7 +118,7 @@ float getO2()
   return o2;
 }
 
-float getwl()
+float getWL()
 {
   return water_level;
 }

@@ -7,6 +7,7 @@
 #include "../lib/ChemicalSensors/SensorEc.h"
 #include "../lib/ChemicalSensors/SensorPh.h"
 #include "../lib/ChemicalSensors/SensorO2.h"
+#include "../lib/WATER/HC_SR04_driver.h"
 #include "../lib/WATER/WaterSensors.h"
 #include "../lib/WATER/Water_Sensors_SM.h"
 
@@ -42,9 +43,9 @@ boolean timeout_Power_Meter;
 boolean MQTT_INIT_NEEDED;
 
 //---------[ Water]-----------
-float Pub_ec1,Pub_O2,Pub_pH;
-long int Pub_TS_ph, Pub_TS_o2, Pub_TS_ec;
-const char* outTopicwater = "/water/sensor/measurement/PHO2CE";
+float Pub_ec1,Pub_O2,Pub_pH, Pub_WL;
+long int Pub_TS_ph, Pub_TS_o2, Pub_TS_ec, Pub_TS_WL;
+const char* outTopicwater = "/water/sensor/measurement/PHO2CEWL";
 char message_water_buffer[150];
 int lastSwitchTimeWater  = 0;
 
@@ -74,9 +75,11 @@ void Publish_Water()
       Pub_TS_ec = get_TS_ec();
       Pub_O2 = getO2();
       Pub_TS_o2 = get_TS_o2();
+      Pub_WL = getWL();
+      Pub_TS_WL = get_TS_water_level();
 
         //sprintf(message_buffer,"{\"pH\":%f,\"o2\":%f,\"ce\":%f}", Pub_pH, Pub_O2, Pub_ec1);
-        sprintf(message_water_buffer,"{\"pH\":{\"timestamp\":%ld,\"value\":%f},\"o2\":{\"timestamp\":%ld,\"value\":%f},\"ec\":{\"timestamp\":%ld,\"value\":%f}}", Pub_TS_ph, Pub_pH, Pub_TS_o2 , Pub_O2, Pub_TS_ec, Pub_ec1);
+        sprintf(message_water_buffer,"{\"pH\":{\"timestamp\":%ld,\"value\":%f},\"o2\":{\"timestamp\":%ld,\"value\":%f},\"ec\":{\"timestamp\":%ld,\"value\":%f},\"WL\":{\"timestamp\":%ld,\"value\":%f}}", Pub_TS_ph, Pub_pH, Pub_TS_o2 , Pub_O2, Pub_TS_ec, Pub_ec1, Pub_WL, Pub_TS_WL);
         client.publish(outTopicwater,message_water_buffer);
 }
 
