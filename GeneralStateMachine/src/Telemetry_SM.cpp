@@ -83,12 +83,11 @@ void Publish_Water()
 void Publish_environment()
 {
   Pub_Luminousity=getLuminousity();
-  Pub_Temperature=getTemperature();
-  Pub_Humidity=getHumidity();
-
   Pub_TS_Luminousity=get_ts_luminousity(); 
+  Pub_Temperature=getTemperature();
   Pub_TS_Temperature=get_ts_temperature();
-  Pub_TS_Humidity=get_ts_humidity();
+  Pub_Humidity=getHumidity();
+  Pub_TS_Humidity=get_ts_humidity();  
 
   sprintf(message_Environment_buffer,"{\"Lumi\":{\"timestamp\":%ld,\"value\":%f},\"Temp\":{\"timestamp\":%ld,\"value\":%f},\"Humi\":{\"timestamp\":%ld,\"value\":%f}}",Pub_TS_Luminousity,Pub_Luminousity, Pub_TS_Temperature,Pub_Temperature,Pub_TS_Humidity,Pub_Humidity);
   client.publish(outTopicEnvironment,message_Environment_buffer);
@@ -99,7 +98,9 @@ void Publish_Consumption()
   Pub_Consumption=getConsumption();
   Pub_TS_Consumption=get_ts_consumption();
 
-  sprintf(message_Environment_buffer,"{\"Consumo\":{\"timestamp\":%ld,\"value\":%f}", Pub_TS_Consumption,Pub_Consumption);
+  sprintf(message_Environment_buffer,"{\"timestamp\":%ld,\"value\":%f}",Pub_TS_Consumption,Pub_Consumption);
+
+  //sprintf(message_Environment_buffer,"{\"Consumo\":{\"timestamp\":%ld,\"value\":%f}", Pub_TS_Consumption,Pub_Consumption);
   client.publish(outTopicPower,message_Environment_buffer);
 }
 

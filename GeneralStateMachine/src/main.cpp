@@ -32,7 +32,7 @@ void setup()
 
 void loop() 
 {
-   
+  
   WaterSensorsTasks();
   EnvironmentTasks();
   PowerMeterTasks();
