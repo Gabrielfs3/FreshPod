@@ -107,7 +107,7 @@ float getPH()
 
 float getEC()
 {
-  return ph;
+  return ec;
 }
 
 float getO2()
