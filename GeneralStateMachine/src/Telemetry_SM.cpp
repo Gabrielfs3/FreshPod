@@ -33,7 +33,7 @@ const int DataMsTelemetry_Water = (1000);          // 1 sec timeout ---alterar
 const int DataMsTelemetry_Environment = 30000;        // 30 segundos timeout
 const int DataMsTelemetry_Power = 60000;              // 1 min timeout
 
-int lastSwitchTimeTelemetry = 0;
+
 
 boolean data_sent;                      //transisitions
 boolean timeout_water_sensor;
@@ -46,18 +46,22 @@ float Pub_ec1,Pub_O2,Pub_pH;
 long int Pub_TS_ph, Pub_TS_o2, Pub_TS_ec;
 const char* outTopicwater = "/water/sensor/measurement/PHO2CE";
 char message_water_buffer[150];
+int lastSwitchTimeWater  = 0;
+
 
 //---------[ Power Meter]-----------
 float Pub_Consumption;
 long int Pub_TS_Consumption;
 const char* outTopicPower ="/Power/sensor/measurement/Consumo";
 char message_Power_buffer[150];
+int lastSwitchTimePower  = 0;
 
 //---------[ Environment]-----------
 float Pub_Luminousity, Pub_Temperature, Pub_Humidity;
 long int Pub_TS_Luminousity, Pub_TS_Temperature, Pub_TS_Humidity;
 const char* outTopicEnvironment ="/Environment/sensor/measurement/LumiTempHumi";
 char message_Environment_buffer[150];
+int lastSwitchTimeEnvironment  = 0;
 
 const char* broker = "192.168.1.122";
 const char* lastWiFiState = "DISCONNECTED";
@@ -158,9 +162,9 @@ void runSwitchCaseTelemetry(int timeMsTelemetry,const char* WiFi_state)        /
       // temos que fazer if aqui visto que pode ler qualquer um doos 3 tipos de sensores////////////
 
       //#################[ Telemetry_Water] ############################
-      if(timeMsTelemetry - lastSwitchTimeTelemetry >= DataMsTelemetry_Water)
+      if(timeMsTelemetry - lastSwitchTimeWater >= DataMsTelemetry_Water)
       {
-        lastSwitchTimeTelemetry = timeMsTelemetry;
+        lastSwitchTimeWater = timeMsTelemetry;
         timeout_water_sensor = 1;
 
         Serial.println("Standy By  Water Telemetry");
@@ -168,9 +172,9 @@ void runSwitchCaseTelemetry(int timeMsTelemetry,const char* WiFi_state)        /
       }
     
       //#################[ Telemetry_Environment] ############################
-      if(timeMsTelemetry - lastSwitchTimeTelemetry >= DataMsTelemetry_Environment)
+      if(timeMsTelemetry - lastSwitchTimeEnvironment >= DataMsTelemetry_Environment)
         {
-          lastSwitchTimeTelemetry = timeMsTelemetry;
+          lastSwitchTimeEnvironment = timeMsTelemetry;
           timeout_Environment = 1;
 
           Serial.println("Standy By Environment Telemetry");
@@ -178,9 +182,9 @@ void runSwitchCaseTelemetry(int timeMsTelemetry,const char* WiFi_state)        /
         }    
 
       //#################[ Telemetry_Power_Meter] ############################
-      if(timeMsTelemetry - lastSwitchTimeTelemetry >= DataMsTelemetry_Power)
+      if(timeMsTelemetry - lastSwitchTimePower >= DataMsTelemetry_Power)
         {
-          lastSwitchTimeTelemetry = timeMsTelemetry;
+          lastSwitchTimePower = timeMsTelemetry;
           timeout_Power_Meter = 1;
 
           Serial.println("Standy By  Power Meter Telemetry");
