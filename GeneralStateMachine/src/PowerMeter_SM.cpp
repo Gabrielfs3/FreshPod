@@ -18,10 +18,6 @@ boolean timeout_consumption_data;
 int lastswitchtimePower = 0, currentstatePower =0;
 long int TS_Consumption;
 
-//-------GPIO'S
-int relay_PIN =18,SEL_PIN=25,CF1_PIN=33,CF_PIN =32;
-char CURRENT_MODE=LOW;
-
 //definir clases
 PowerMeter power_SM(CF_PIN,CF1_PIN,SEL_PIN,CURRENT_MODE,relay_PIN);
 

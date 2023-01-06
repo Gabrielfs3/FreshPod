@@ -2,8 +2,6 @@
 #include "..\lib\EnvironmentSensors\EnvironmentSensors_SM.h"
 #include "..\lib\EnvironmentSensors\EnvironmentSensors.h"
 
-#define baudrate    115200
-
 #define UPDATE_TIME                     1000 //sampling da ENVIRONMENT task
 
 //estados
@@ -22,17 +20,8 @@ int lastswitchtimeEnvironment = 0, currentstateEnvironment =0;
 
 long int TS_Lumi, TS_Temp, TS_Humi;
 
-//GPIOS
-//------[DHT11]------
-#define yellow_pin  27
-#define DHTTYPE 11 //modelo do equipamento 
-
-//------[luminousity]------
-#define SCL                             22
-#define SCA                             21
-
 //definir clases
-environment ambi(yellow_pin, DHTTYPE, SCL, SCA, baudrate);
+environment ambi(yellow_pin, DHTTYPE, _SCL, _SDA, baudrate);
 
 void InitEnvironmentSensors()
 {

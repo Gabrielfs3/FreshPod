@@ -8,13 +8,7 @@
 #include "Water_Sensors_SM.h"
 #include "Telemetry_SM.h"
 #include "WiFi_Driver.h"
-
-
-int sensor_pin_ph = 33;
-int sensor_pin_o2= 32;
-int sensor_pin_ec = 35;
-int sensor_pin_pin_echo = 12;
-int sensor_pin_pin_trig = 14;
+#include "GPIOs.h"
 
 
 const char* rede = "Vodafone-624E88";
@@ -26,12 +20,12 @@ WiFi_Driver wifi_esp(rede,password);
 
 void setup()
 {
-    Serial.begin(115200);
-    wifi_esp.Init();
-    WATER_SENSORS_INIT();
-    InitEnvironmentSensors();
-    InitPowerMeter();
-    MQTT_INIT();
+  Serial.begin(115200);
+  wifi_esp.Init();
+  WATER_SENSORS_INIT();
+  InitEnvironmentSensors();
+  InitPowerMeter();
+  MQTT_INIT();
 }
 
 void loop() 

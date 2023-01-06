@@ -8,13 +8,13 @@
 
 //variavies globais 
 static float lux, humi,temp;
-int _yellow_pin,_type,_scl_,_sca_;
+int _yellow_pin,_type,_scl_,_sda_;
 long int  TimeStamp_lumi, TimeStamp_temp, TimeStamp_humi;
 
 WiFiUDP ntpUDP_Environment;
 NTPClient timeClient_Environment(ntpUDP_Environment);
 
- environment:: environment(int pin, int DHTTYPE, int _scl, int _sca, int baud) //Definir GPIO'S
+ environment:: environment(int pin, int DHTTYPE, int _scl, int _sda, int baud) //Definir GPIO'S
 {   
     //======DHT11======
     yellow_pin=pin;
@@ -22,10 +22,10 @@ NTPClient timeClient_Environment(ntpUDP_Environment);
     
     //======luminosity======
     scl=_scl;
-    sca=_sca;
+    sda=_sda;
     //=========[passar para publico]=====
     _scl_=_scl;
-    _sca_=_sca;
+    _sda_=_sda;
     _yellow_pin=pin;
     _type=DHTTYPE;
 
@@ -33,7 +33,7 @@ NTPClient timeClient_Environment(ntpUDP_Environment);
 }
 
 //-----------[definir classes]-------------
-LuminositySensor luxs(_scl_, _sca_);
+LuminositySensor luxs(_scl_, _sda_);
 DHT11class DHT11(_yellow_pin,_type);
 //------------------------------------------
 

@@ -3,6 +3,9 @@
 
 #include "Arduino.h"
 
+
+extern int  yellow_pin,DHTTYPE,_SCL,_SDA,baudrate;
+
 class environment{
     public:
         environment(int, int, int, int, int);
@@ -19,7 +22,7 @@ class environment{
         int yellow_pin;
         int type;
         int scl;
-        int sca;
+        int sda;
         int baudrate;
 };
 
