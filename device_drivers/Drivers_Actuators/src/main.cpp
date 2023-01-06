@@ -22,11 +22,12 @@ void loop()
     a = a^1;
     b = b^1;
     c = c^1;
+
     setPump(a);
     setLED(a);
     setFan(a);
 
-     delay(1000);
+    delay(1000);
 
  
 }
