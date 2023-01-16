@@ -51,7 +51,7 @@ void PowerMeter::power_task(int time)
 
 void energy()
 {   
-    power=11;//for testing "Potencia(W)"
+    //power=11;//for testing "Potencia(W)"
 
     //convert=((power)*(sampling/1000.0))/(60.0*60.0); 
     ener=(ener/3600);//(sampling/1000.0);// passar para Wh
@@ -79,6 +79,22 @@ float PowerMeter::return_power()
 {   
     return power;
 } 
+
+float PowerMeter::instant_power()
+{
+    float instantaneous_power=0.0, power_mean=0.0, sum=0.0;
+    int i;
+
+    for (i=0;i<1;i++)
+    {
+        delay(4000);
+        instantaneous_power=hlw8012pm.get_power();
+        sum += instantaneous_power;
+    }
+    power_mean=sum/i;
+    
+    return power_mean;
+}
 
 long int  PowerMeter::return_TS_power()
 {

@@ -8,7 +8,14 @@
 #include "WifiEsp32.h"
 
 #define UPDATE_TIME                     5000
-#define Task_TIME                       2000 
+#define Task_TIME                       5000 
+
+
+#define all_ON  40
+#define LEDsON_PumpOFF 40
+#define LEDsOFF_PumpON 40
+#define LEDsOFF_PumpOFF 2
+#define Erro 4 
 
 //estados
 enum struct trafStatesALARMISTIC : int        
@@ -20,29 +27,32 @@ enum struct trafStatesALARMISTIC : int
 };
 
 //Eventos
-boolean read_equal_theo;                 
-boolean timeout_consumption_data;
-boolean read_not_equal_theo;
-boolean false_alarm;
-boolean Alarm_2_Send;
-boolean Alarm_Sent;
+boolean read_equal_theo=0;                 
+boolean timeout_consumption_data=0;
+boolean read_not_equal_theo=0;
+boolean false_alarm=0;
+boolean Alarm_2_Send=0;
+boolean Alarm_Sent=0;
 
 //definir clases
 PowerMeter  power_meter(CF_PIN,CF1_PIN,SEL_PIN,CURRENT_MODE,relay_PIN);
 
-//WiFiClient net;
-//PubSubClient client(net);
+WiFiClient net;
+PubSubClient client(net);
 
 //global variables
 int lastSwitchTime = 0, currentstate =0;
 int lastSwitchTimeCheck=0;
 
+boolean LastStateLED;
+boolean LastStatePump;
+
 extern int geral_power;
 const char* outTopicAlarm = "/ALarm";
+char message_Alarm_buffer[2];
 
 //definir funções
 bool troubleshooting(), check();
-void power_task();
 
 
 void  InitAlarmistic()
@@ -51,6 +61,8 @@ void  InitAlarmistic()
 
   power_meter.Init();
   Init_AllActuators();
+  setLED(1);
+  setPump(0);
 }
 
 //initial state
@@ -58,35 +70,41 @@ trafStatesALARMISTIC state = trafStatesALARMISTIC::STAND_BY_ALARMISTICA;
 
 int runSwitchCase(int timeMs)        //state machine
 {
-
+  
     if(timeout_consumption_data==1)
     {
       state = trafStatesALARMISTIC::READ_AND_CHECK;
+      timeout_consumption_data=0;
     }
 
     if(read_equal_theo==1)
     {
       state = trafStatesALARMISTIC::STAND_BY_ALARMISTICA;
+      read_equal_theo=0;
     }
     
     if(read_not_equal_theo==1)
     {
       state = trafStatesALARMISTIC::TROBLESHOOTING;
+      read_not_equal_theo=0;
     }
     
     if(false_alarm==1)
     {
       state = trafStatesALARMISTIC::STAND_BY_ALARMISTICA;
+      false_alarm=0;
     }
 
     if(Alarm_2_Send==1)
     {
       state = trafStatesALARMISTIC::SEND_ALARM;
+      Alarm_2_Send=0;
     }
     
     if(Alarm_Sent==1)
     {
       state = trafStatesALARMISTIC::STAND_BY_ALARMISTICA;
+      Alarm_Sent=0;
     }
 
     switch (state)
@@ -97,76 +115,57 @@ int runSwitchCase(int timeMs)        //state machine
           {
             lastSwitchTime = timeMs;
             timeout_consumption_data=1;
-            read_equal_theo=0;                 
-            read_not_equal_theo=0;
-            false_alarm=0;
-            Alarm_2_Send=0;
-            Alarm_Sent=0;
             currentstate =0;
-            Serial.println("ESTADO  0 "); 
+            Serial.println("ESTADO  StandBY "); 
           }
         break;
     case trafStatesALARMISTIC::READ_AND_CHECK:  
 
       //verificar o valor teorico
-      if (check()) 
+      //Serial.println(!check());
+      if (!check()) 
       {
-        read_equal_theo=1;                 
-        read_not_equal_theo=0;
+        read_equal_theo=1;                   
       }
       else
-      {
-        read_equal_theo=0;                 
+      {                 
         read_not_equal_theo=1;
-      }
-      timeout_consumption_data=0;
-      false_alarm=0;
-      Alarm_2_Send=0;
-      Alarm_Sent=0;
-      
+      } 
       currentstate =1;
-      Serial.println("ESTADO  1 "); 
+      Serial.println("ESTADO  Check "); 
       break;
 
     
     case trafStatesALARMISTIC::TROBLESHOOTING: 
         //chamar uma função bool troubleshooting()
+           LastStateLED=Return_LED();
+           LastStatePump=Return_Pump();
 
         if( troubleshooting())
         {
           Serial.println("enviar alarm"); //debug
-          false_alarm=0;
           Alarm_2_Send=1;
         } 
         else
         { 
           Serial.println("falso alarm");  //debug
           false_alarm=1;
-          Alarm_2_Send=0;
         } 
-
-      timeout_consumption_data=0;
-      read_equal_theo=0;                 
-      read_not_equal_theo=0;
-      Alarm_Sent=0;
-
+         setLED(LastStateLED);
+         setPump(LastStatePump);
       currentstate =2;
-      Serial.println("ESTADO  2 ");
+      Serial.println("ESTADO  Troble ");
       break;
 
     case trafStatesALARMISTIC::SEND_ALARM: 
         //MANDAR UMA MENSAGEM PARA O GRAFANA
-        //sprintf(message_ALARM, "")
-        //client.publish(outTopicAlarm,message_ALARM);
+        sprintf(message_Alarm_buffer, "S");
+        client.publish(outTopicAlarm,message_Alarm_buffer);
 
-        timeout_consumption_data=0;
-        read_equal_theo=0;                 
-        read_not_equal_theo=0;
-        false_alarm=0;
-        Alarm_2_Send=0;
+    
         Alarm_Sent=1;
         currentstate =3;
-        Serial.println("ESTADO  3 ");
+        Serial.println("ESTADO  Send_alarm ");
         break;
     }
 
@@ -186,20 +185,61 @@ int returnAlarmisticState(int currentstate)
 
 bool check()
 {
-  float power_, power_mean;
+  float power_instant =power_meter.instant_power();
   boolean check_power;
-
-  power_task(); //executar a task do power meter passados o Task_TIME
-  power_=power_meter.return_power(); //Potencia instantanea
-
-  if (geral_power==power_)
+Serial.println(power_instant);
+  if((Return_LED()==1) && (Return_Pump()==1))
   {
-    check_power=1; 
+    Serial.println("onon");
+    if((power_instant> (all_ON - Erro)) && (power_instant< all_ON + Erro) )
+        {
+          check_power=0;
+        }
+    else
+      {
+         check_power=1; 
+      }
   }
-  else
+
+  else if((Return_LED()==0) && (Return_Pump()==1))
   {
-    check_power=0;
+    Serial.println("offon");
+    if((power_instant> LEDsOFF_PumpON - Erro) && (power_instant< LEDsOFF_PumpON + Erro) )
+        {
+          check_power=0;
+        }
+    else
+      {
+         check_power=1; 
+      }
   }
+
+    else if((Return_LED()==1) && (Return_Pump()==0))
+     {
+    Serial.println("onoff");
+    if((power_instant> LEDsON_PumpOFF - Erro) && (power_instant< LEDsON_PumpOFF + Erro) )
+        {
+          check_power=0;
+        }
+    else
+      {
+         check_power=1; 
+      }
+  }
+
+    else if((Return_LED()==0) && (Return_Pump()==0))
+  {
+    Serial.println("offoff");
+    if((power_instant> LEDsOFF_PumpOFF - Erro) && (power_instant< LEDsOFF_PumpOFF + Erro) )
+        {
+          check_power=0;
+        }
+    else
+      {
+         check_power=1; 
+      }
+  }
+
   
   return check_power; 
 }
@@ -212,28 +252,28 @@ bool troubleshooting()
 
   //---[watter pump] ----
   setPump(0); //Turn off=> 0
-  power_task();
-  Wh_Pump_off=power_meter.return_energy();
-  Serial.println(Wh_Pump_off); //debug
+  Wh_Pump_off=power_meter.instant_power(); //potencia instantanea
+  Serial.print("Pump: ");
+  Serial.print(Wh_Pump_off); //debug
   setPump(1);//Turn on => 1
-  power_task();
-  Wh_Pump_on=power_meter.return_energy();
-  Serial.println(Wh_Pump_off); //debug
+  Wh_Pump_on=power_meter.instant_power();
+  Serial.println(Wh_Pump_on); //debug
 
-  if(Wh_Pump_on > Wh_Pump_off)
+  if((Wh_Pump_on-Wh_Pump_off > 1)) //ter uma gama (Wh_Pump_on-Wh_Pump_off >gama)
   {
     alarm_Pump=0;
   }
 
-  //---[LEDS]----
+    //---[LEDS]----
   setLED(0);//Turn off=> 0
-  power_task();
-  Wh_LEDS_off=power_meter.return_energy();
+  Wh_LEDS_off=power_meter.instant_power(); //potencia instantanea
+  Serial.print("LEDS: ");
+  Serial.print(Wh_LEDS_off);
   setLED(1);//Turn on=> 1
-  power_task();
-  Wh_LEDS_on=power_meter.return_energy();
+  Wh_LEDS_on=power_meter.instant_power();
+  Serial.println(Wh_LEDS_on);
 
-  if(Wh_LEDS_on > Wh_LEDS_off)
+  if((Wh_LEDS_on-Wh_LEDS_off > 1)) //ter uma gama
   {
     alarm_LEDS=0;
   }
@@ -244,23 +284,6 @@ bool troubleshooting()
     alarm=0;
   }
 
-  return alarm;
-}
 
-void power_task()
-{
-  int CheckTimeMs=0, CurrentMilis=millis(),lastSwitchTimeTask=0;
-  CheckTimeMs=CurrentMilis;
-  
-  while (lastSwitchTimeTask!= CheckTimeMs)
-  {
-    CheckTimeMs = millis(); //valor atual dos milisec
-    //Serial.println("Dentro do WHILE");
-    if((CheckTimeMs-lastSwitchTimeTask)>(CurrentMilis+Task_TIME))
-    {
-      lastSwitchTimeTask = CheckTimeMs;
-      Serial.println("Dentro do IF-> task powermeter");
-      power_meter.power_task(CurrentMilis+Task_TIME);
-    }
-  }
+  return alarm;
 }

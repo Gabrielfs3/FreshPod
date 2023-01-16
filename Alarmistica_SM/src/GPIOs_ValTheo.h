@@ -15,5 +15,3 @@
 //----------------------------------
 
 //----------[Valores teoricos]------------------------
-int geral_consumption=0.11; //wh
-int geral_power=11;
