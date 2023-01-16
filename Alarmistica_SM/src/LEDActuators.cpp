@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <LEDActuators.h>
 
-const int LEDPIN = 27;     //nr of output pin LED relay
+const int LEDPIN = 26;     //nr of output pin LED relay
 boolean LEDstate = 0 ;         //variable to store state of LED relay, 1 = on
 
 void Init_LED()                 //set LEDsPin as Output
