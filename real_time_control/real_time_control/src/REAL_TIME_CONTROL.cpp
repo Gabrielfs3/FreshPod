@@ -29,7 +29,7 @@ struct  Eventos
     };
 
 trafStatesRealTime Real_time;       
-Eventos evento;
+Eventos evento_rt;
 
 char* msg_LEDs,*msg_Fans, *msg_Pump;
 
@@ -52,22 +52,22 @@ void Real_Time::Task(){
        //processar todos os eventos
 
        client.loop();
-        if(evento.subscribed_topics == true)
+        if(evento_rt.subscribed_topics == true)
         {
             RealTimeState=trafStatesRealTime::STAND_BY_REAL_TIME;
-            evento.subscribed_topics= false;
+            evento_rt.subscribed_topics= false;
         }
 
-        else if(evento.Updated_actuator_states== true)
+        else if(evento_rt.Updated_actuator_states== true)
         {
             RealTimeState=trafStatesRealTime::STAND_BY_REAL_TIME;
-            evento.Updated_actuator_states= false;
+            evento_rt.Updated_actuator_states= false;
         }
 
-        else if(evento.msg_received== true)
+        else if(evento_rt.msg_received== true)
         {
             RealTimeState=trafStatesRealTime::ACTUATOR_OUTPUT_UPDATE;
-            evento.msg_received= false;
+            evento_rt.msg_received= false;
         }
 
 
@@ -104,7 +104,7 @@ void Real_Time::Task(){
                       setFan(false);
                       Serial.println("desliga fan");
 
-                      evento.Updated_actuator_states=true;
+                      evento_rt.Updated_actuator_states=true;
       }
 
             
@@ -127,7 +127,7 @@ void Real_Time::Task(){
 void callback(char* topic, byte* payload, unsigned int length) {
     payload[length] = '\0';
     String strTopic = String((char*)topic);
-    evento.msg_received=true;
+    evento_rt.msg_received=true;
 
     if (strTopic == "/Actuadores/RealTime/Control/LEDs") {
       msg_LEDs = (char*)payload;
