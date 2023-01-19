@@ -11,9 +11,11 @@ float getPH();
 float getO2();
 float getEC();
 float getWL();
+float gettemperature();
 long int get_TS_ph();
 long int get_TS_o2();
 long int get_TS_ec();
 long int get_TS_water_level();
+float get_TS_temperature();
 
 #endif

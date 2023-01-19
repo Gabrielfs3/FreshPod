@@ -6,34 +6,34 @@
 #include "SensorO2.h"
 #include "WaterSensors.h"
 #include "HC_SR04_driver.h"
+#include "DS18B20.h"
 
 //sampling
 #define water_sampling 1000 //1secS
 
-static float o2, ph, ec, water_level;
+static float o2, ph, ec, water_level, temp;
 long int TimeStamp_o2;
 long int TimeStamp_ph;
 long int TimeStamp_ec;
 long int TimeStamp_water_level;
+long int TimeStamp_temp_;
 int pinecho, pintrig;
 
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP);
 
-WaterSensors::WaterSensors(int pin, int pinx, int piny, int pink, int ping)
+WaterSensors::WaterSensors(int pink, int ping)
 {
-    sensor_pin_ph = pin;
-    sensor_pin_o2 = pinx;
-    sensor_pin_ec = piny;
     echo_Pin = pink;
     trig_Pin = ping;
     pinecho = echo_Pin;
     pintrig = trig_Pin;
 }
 
-SensorPh sensorph(sensor_pin_ph);
-SensorO2 sensoro2(sensor_pin_o2);
-SensorEc sensorec(sensor_pin_ec);
+SensorPh sensorph;
+SensorO2 sensoro2;
+SensorEc sensorec;
+DS18B20 ds18b203(32);
 HC_SR04_driver sensorwl(pinecho,pintrig);
 
 void WaterSensors::init()
@@ -43,6 +43,7 @@ void WaterSensors::init()
     sensoro2.init();
     sensorec.init();
     sensorwl.Init();
+    ds18b203.Init();
     timeClient.update();
 }
 
@@ -56,6 +57,8 @@ void WaterSensors::water_sensors_tasks() //Executa a task de sampling em samplin
     TimeStamp_ec = timeClient.getEpochTime();
     water_level = sensorwl.get_dist();
     TimeStamp_water_level = timeClient.getEpochTime();
+    temp = ds18b203.get_temperature();
+    TimeStamp_temp_ = timeClient.getEpochTime();
 }
 
 float WaterSensors::return_ph()
@@ -71,6 +74,11 @@ float WaterSensors::return_o2()
 float WaterSensors::return_ec()
 {
     return ec;
+}
+
+float WaterSensors::return_temp()
+{
+    return temp;
 }
 
 float WaterSensors::return_water_level()
@@ -96,4 +104,9 @@ long int WaterSensors::return_TS_ec()
 long int WaterSensors::return_TS_water_level()
 {
     return TimeStamp_water_level;
+}
+
+long int WaterSensors::return_TS_temp()
+{
+    return TimeStamp_temp_;
 }

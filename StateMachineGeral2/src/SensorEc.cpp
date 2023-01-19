@@ -1,45 +1,46 @@
 #include <Arduino.h>
 #include "SensorEc.h"
+#include <DS18B20.h>
+#include "DFRobot_EC.h"
+#include <EEPROM.h>
+#include <Wire.h>
+#include <SPI.h>
+#include <DFRobot_ADS1115.h>
 
 
-SensorEc::SensorEc(int pin)
-{
-    pin_ec=pin;
-}
+#define RES2 820.0
+#define ECREF 200.0
+
+DFRobot_EC ec;
+DFRobot_ADS1115 ads(&Wire);
+DS18B20 ds18b20(32);
 
 void SensorEc::init()
 {
-    pinMode(pin_ec,OUTPUT);
+  ds18b20.Init();
+  ec.begin();
+  ads.setAddr_ADS1115(ADS1115_IIC_ADDRESS0);   // 0x48
+  ads.setGain(eGAIN_ONE);   // 2/3x gain
+  ads.setMode(eMODE_SINGLE);       // single-shot mode
+  ads.setRate(eRATE_128);          // 128SPS (default)
+  ads.setOSMode(eOSMODE_SINGLE);   // Set to start a single-conversion
+  ads.init();
 }
 
 float SensorEc::get_ec()
 {
-   for(int i=0;i<10;i++)                               //Get 10 sample value from the sensor for smooth the value
-    { 
-        buf[i]=analogRead(pin_ec);                   //Saves 10 samples on a buffer got from the sensor reading
-        delay(100);
-    }
-    for(int i=0;i<9;i++)                                //Sort the analog from small to large
-    {
-        for(int j=i+1;j<10;j++)                             //Sweep all values saved on buffer
-        {
-            if(buf[i]>buf[j])
-            {
-                e_c=buf[i];
-                buf[i]=buf[j];
-                buf[j]=e_c;
-            }
-        }
-    }
-
-    avgValue=0;
-
-    for(int i=2;i<8;i++)                            //Take the average value of 6 center sample
-    {                                               //Get rid of first 2 and last 2 samples
-        avgValue+=buf[i];
-    }
-    avgValue = ((float)avgValue/6);                 //Calculate mean value of 6 samples
-    ec_Value=(float)avgValue*3.3/4096;              //Convert the analog value into millivolt
-    ec_Value=6.060606060*ec_Value;                  //Convert the millivolt into EC value
-    return ec_Value;
+  static unsigned long timepoint = millis();
+  if(millis()-timepoint>1000U)  //time interval: 1s
+  {
+  timepoint = millis();
+  if (ads.checkADS1115())
+  {
+    voltage = float(ads.readVoltage(0));   // read the voltage(VOLTS)
+  }
+  temperature = ds18b20.get_temperature();          // read your temperature sensor to execute temperature compensation
+  //ecValue=ec.readEC(voltage,temperature);  // convert voltage to EC with temperature compensation
+  _rawEC = 1000*voltage/RES2/ECREF;
+  ecValue = voltage / (1.0+0.0185*(temperature-25.0));  //temperature compensation
+  }
+  return ecValue;
 }

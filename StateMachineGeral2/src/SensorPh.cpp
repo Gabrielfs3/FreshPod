@@ -1,47 +1,44 @@
 #include <Arduino.h>
 #include "SensorPh.h"
+#include <DS18B20.h>
+#include "DFRobot_PH.h"
+#include <EEPROM.h>
+#include <Wire.h>
+#include <SPI.h>
+#include <DFRobot_ADS1115.h>
 
 
-SensorPh::SensorPh(int pin)
-{
-    pin_ph=pin;
-}
+DFRobot_PH ph;
+DFRobot_ADS1115 ads_1(&Wire);
+DS18B20 ds18b20_1(32);
+
 
 void SensorPh::init()
 {
-    pinMode(pin_ph,INPUT);
+  ds18b20_1.Init();
+  ph.begin();
+  ads_1.setAddr_ADS1115(ADS1115_IIC_ADDRESS0);   // 0x48
+  ads_1.setGain(eGAIN_ONE);   // 2/3x gain
+  ads_1.setMode(eMODE_SINGLE);       // single-shot mode
+  ads_1.setRate(eRATE_128);          // 128SPS (default)
+  ads_1.setOSMode(eOSMODE_SINGLE);   // Set to start a single-conversion
+  ads_1.init();
 }
 
 float SensorPh::get_ph()
 {
-    for(int i=0;i<10;i++)                           //Get 10 sample value from the sensor for smooth the value
-    { 
-        buf[i]=analogRead(pin_ph);               //Saves 10 samples on a buffer got from the sensor reading
-        delay(100);
-    }
-
-    for(int i=0;i<9;i++)                            //Sort the analog from small to large
+  static unsigned long timepoint = millis();
+  if(millis()-timepoint>1000U)  //time interval: 1s
+  {
+    timepoint = millis();
+    if (ads_1.checkADS1115())
     {
-        for(int j=i+1;j<10;j++)                         //Sweep all values saved on buffer
-        {
-            if(buf[i]>buf[j])
-            {
-                ph=buf[i];
-                buf[i]=buf[j];
-                buf[j]=ph;
-            }
-        }
+      voltage = float(ads_1.readVoltage(1));   // read the voltage(VOLTS)
     }
-
-    avgValue=0;
-
-    for(int i=2;i<8;i++)                            //Take the average value of 6 center sample
-    {                                               //Get rid of first 2 and last 2 samples
-        avgValue+=buf[i];
-    }
-
-    avgValue = ((int)avgValue/6);                 //Calculate mean value of 6 samples*/
-    ph_Value=analogRead(pin_ph)*3.3/4096;         //Convert the analog value into millivolt
-    ph_Value=4.24242424*ph_Value;                 //Convert the millivolt into pH value
-    return ph_Value;
+    Serial.println("Voltage: ");
+    Serial.print(voltage);
+    temperature = ds18b20_1.get_temperature();           // read your temperature sensor to execute temperature compensation
+    phValue = ph.readPH(voltage,temperature);  // convert voltage to pH with temperature compensation
+   }
+   return phValue;
 }

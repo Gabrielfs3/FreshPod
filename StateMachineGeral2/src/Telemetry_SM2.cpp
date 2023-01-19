@@ -12,6 +12,7 @@
 #include "../lib/WATER/Water_Sensors_SM.h"
 
 #include <ArduinoJson.h>
+#include "Water_Sensors_SM.h"
 #include "EnvironmentSensors_SM.h"
 #include "PowerMeter_SM.h"
 
@@ -43,8 +44,8 @@ boolean timeout_Power_Meter;
 boolean MQTT_INIT_NEEDED;
 
 //---------[ Water]-----------
-float Pub_ec1,Pub_O2,Pub_pH, Pub_WL;
-long int Pub_TS_ph, Pub_TS_o2, Pub_TS_ec, Pub_TS_WL;
+float Pub_ec1,Pub_O2,Pub_pH, Pub_WL, Pub_temp;
+long int Pub_TS_ph, Pub_TS_o2, Pub_TS_ec, Pub_TS_WL, Pub_TS_temp;
 const char* outTopicwater = "/water/sensor/measurement/PHO2CEWL";
 char message_water_buffer[150];
 int lastSwitchTimeWater  = 0;
@@ -77,9 +78,11 @@ void Publish_Water()
       Pub_TS_o2 = get_TS_o2();
       Pub_WL = getWL();
       Pub_TS_WL = get_TS_water_level();
+      Pub_temp = gettemperature();
+      Pub_TS_temp = get_TS_temperature();
 
         //sprintf(message_buffer,"{\"pH\":%f,\"o2\":%f,\"ce\":%f}", Pub_pH, Pub_O2, Pub_ec1);
-        sprintf(message_water_buffer,"{\"pH\":{\"timestamp\":%ld,\"value\":%f},\"o2\":{\"timestamp\":%ld,\"value\":%f},\"ec\":{\"timestamp\":%ld,\"value\":%f},\"WL\":{\"timestamp\":%ld,\"value\":%f}}", Pub_TS_ph, Pub_pH, Pub_TS_o2 , Pub_O2, Pub_TS_ec, Pub_ec1, Pub_WL, Pub_TS_WL);
+        sprintf(message_water_buffer,"{\"pH\":{\"timestamp\":%ld,\"value\":%f},\"o2\":{\"timestamp\":%ld,\"value\":%f},\"ec\":{\"timestamp\":%ld,\"value\":%f},\"WL\":{\"timestamp\":%ld,\"value\":%f},\"Temperature\":{\"timestamp\":%ld,\"value\":%f}}", Pub_TS_ph, Pub_pH, Pub_TS_o2 , Pub_O2, Pub_TS_ec, Pub_ec1, Pub_TS_WL, Pub_WL, Pub_TS_temp, Pub_temp);
         client2.publish(outTopicwater,message_water_buffer);
 }
 

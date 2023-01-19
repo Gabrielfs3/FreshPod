@@ -1,46 +1,57 @@
 #include <Arduino.h>
 #include "SensorO2.h"
+#include <DS18B20.h>
+#include <EEPROM.h>
+#include <Wire.h>
+#include <SPI.h>
+#include <DFRobot_ADS1115.h>
 
+DFRobot_ADS1115 ads_2(&Wire);
+DS18B20 ds18b20_2(32);
 
-SensorO2::SensorO2(int pin)
+#define VREF 5000    //VREF (mv)
+#define ADC_RES 1024 //ADC Resolution
+
+#define CAL1_V (1600) //mv
+#define CAL1_T (20)   //℃
+
+const uint16_t DO_Table[41] = {
+    14460, 14220, 13820, 13440, 13090, 12740, 12420, 12110, 11810, 11530,
+    11260, 11010, 10770, 10530, 10300, 10080, 9860, 9660, 9460, 9270,
+    9080, 8900, 8730, 8570, 8410, 8250, 8110, 7960, 7820, 7690,
+    7560, 7430, 7300, 7180, 7070, 6950, 6840, 6730, 6630, 6530, 6410};
+
+int16_t readDO(uint32_t voltage_mv, uint8_t temperature_c)
 {
-    pin_o2=pin;
+  uint16_t V_saturation = (uint32_t)CAL1_V + (uint32_t)35 * temperature_c - (uint32_t)CAL1_T * 35;
+  return (voltage_mv * DO_Table[temperature_c] / V_saturation);
 }
 
 void SensorO2::init()
 {
-    pinMode(pin_o2,OUTPUT);
+  ds18b20_2.Init();
+  ads_2.setAddr_ADS1115(ADS1115_IIC_ADDRESS0);   // 0x48
+  ads_2.setGain(eGAIN_ONE);   // 2/3x gain
+  ads_2.setMode(eMODE_SINGLE);       // single-shot mode
+  ads_2.setRate(eRATE_128);          // 128SPS (default)
+  ads_2.setOSMode(eOSMODE_SINGLE);   // Set to start a single-conversion
+  ads_2.init();
 }
 
 float SensorO2::get_o2()
 {
-    for(int i=0;i<10;i++)                                   //Get 10 sample value from the sensor for smooth the value
-    { 
-        buf[i]=analogRead(pin_o2);                          //Saves 10 samples on a buffer got from the sensor reading
-        delay(100);
-    }
-    for(int i=0;i<9;i++)                                    //Sort the analog from small to large
-    {
-        for(int j=i+1;j<10;j++)                                 //Sweep all values saved on buffer
-        {
-            if(buf[i]>buf[j])
-            {
-                o_2=buf[i];
-                buf[i]=buf[j];
-                buf[j]=o_2;
-            }
-        }
-    }
-
-    avgValue=0;
-
-    for(int i=2;i<8;i++)                                    //Take the average value of 6 center sample
-    {                                                       //Get rid of first 2 and last 2 samples
-        avgValue+=buf[i];
-    }
-
-    avgValue = ((float)avgValue/6);                         //Calculate mean value of 6 samples
-    o2_Value=(float)avgValue*3.3/4096;                      //Convert the analog value into millivolt
-    o2_Value=6.060606060*o2_Value;                          //Convert the millivolt into pH value
-    return o2_Value;
+  static unsigned long timepoint = millis();
+  if(millis()-timepoint>1000U)  //time interval: 1s
+  {
+  timepoint = millis();
+  if (ads_2.checkADS1115())
+  {
+    voltage = float(ads_2.readVoltage(2));   // read the voltage(VOLTS)
+  }
+  temperature = ds18b20_2.get_temperature();           // read your temperature sensor to execute temperature compensation
+  //ecValue=ec.readEC(voltage,temperature);  // convert voltage to EC with temperature compensation
+  ADC_Voltage = VREF * voltage / ADC_RES;
+  o2Value = readDO(voltage, temperature);
+  }
+  return o2Value;
 }
